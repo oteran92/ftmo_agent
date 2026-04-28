@@ -74,8 +74,12 @@ fi
 "
 
 echo ""
-echo "=== Step 3: Install Python dependencies ==="
-run_remote "cd /opt/ftmo_agent && pip3 install -q -r requirements.txt"
+echo "=== Step 3: Install Python dependencies (venv) ==="
+run_remote "
+apt-get install -y -qq python3.12-venv python3-full
+python3 -m venv /opt/ftmo_venv
+/opt/ftmo_venv/bin/pip install -q -r /opt/ftmo_agent/requirements.txt
+"
 
 echo ""
 echo "=== Step 4: Create .env on server ==="
@@ -104,7 +108,7 @@ Type=simple
 User=root
 WorkingDirectory=/opt/ftmo_agent
 EnvironmentFile=/opt/ftmo_agent/.env
-ExecStart=/usr/bin/python3 -u monitor.py
+ExecStart=/opt/ftmo_venv/bin/python -u monitor.py
 Restart=always
 RestartSec=60
 StandardOutput=journal
