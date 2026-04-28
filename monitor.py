@@ -40,7 +40,8 @@ CEST = timezone(timedelta(hours=2))
 H4_CLOSE_HOURS_CEST = {23, 3, 7, 11, 15, 19}
 H4_CHECK_MINUTE     = 3    # fire 3 minutes after close (TwelveData needs a moment to update)
 POLL_INTERVAL       = 30   # wake every 30s to check if it's time to run
-PAIRS               = ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD"]
+PAIRS               = ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD",
+                       "EURJPY", "GBPJPY", "AUDUSD", "USDCAD", "USDCHF"]
 
 
 # ── Time helpers ───────────────────────────────────────────────────────────────

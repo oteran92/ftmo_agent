@@ -11,7 +11,7 @@ Methodology (professional swing trading, FTMO-safe):
   6. TP:                  Entry ± (SL distance × 2.0) minimum
 
 Data source: TwelveData API (https://twelvedata.com)
-  Free plan: 800 req/day. Usage: ~48 req/day for 4 pairs x 6 H4 closes.
+  Free plan: 800 req/day. Usage: ~108 req/day for 9 pairs x 6 H4 closes.
   Set TWELVEDATA_API_KEY in .env
 """
 
@@ -34,6 +34,11 @@ _SYMBOL_MAP = {
     "GBPUSD": "GBP/USD",
     "USDJPY": "USD/JPY",
     "XAUUSD": "XAU/USD",
+    "EURJPY": "EUR/JPY",
+    "GBPJPY": "GBP/JPY",
+    "AUDUSD": "AUD/USD",
+    "USDCAD": "USD/CAD",
+    "USDCHF": "USD/CHF",
 }
 
 # Pip size per symbol for distance calculations
@@ -42,6 +47,11 @@ _PIP_SIZE = {
     "GBPUSD": 0.0001,
     "USDJPY": 0.01,
     "XAUUSD": 0.1,
+    "EURJPY": 0.01,
+    "GBPJPY": 0.01,
+    "AUDUSD": 0.0001,
+    "USDCAD": 0.0001,
+    "USDCHF": 0.0001,
 }
 
 # In-memory cache to avoid redundant API calls within the same cycle
@@ -341,7 +351,8 @@ def scan_all_pairs() -> list[dict]:
     Scan all monitored pairs via TwelveData — no MT5 required.
     Adds inter-pair delay to stay within free plan rate limit (8 req/min).
     """
-    pairs = ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD"]
+    pairs = ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD",
+             "EURJPY", "GBPJPY", "AUDUSD", "USDCAD", "USDCHF"]
     results = []
     for i, pair in enumerate(pairs):
         if i > 0:
