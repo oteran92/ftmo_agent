@@ -270,6 +270,18 @@ def main() -> None:
     print(f"[Monitor] Fires at H4 closes: {sorted(H4_CLOSE_HOURS_CEST)}:{H4_CHECK_MINUTE:02d} CEST", flush=True)
     print(f"[Monitor] Polling every {POLL_INTERVAL}s", flush=True)
 
+    # Send startup confirmation email so we know the service is live
+    send_email_alert(
+        subject="FTMO Monitor — Service started",
+        body=(
+            f"FTMO Monitor is running on the cloud server.\n"
+            f"Started: {_now_str()}\n\n"
+            f"Scanning: {', '.join(PAIRS)}\n"
+            f"Schedule: H4 closes at {sorted(H4_CLOSE_HOURS_CEST)}:03 CEST\n\n"
+            f"— FTMO Agent"
+        ),
+    )
+
     last_check_hour = -1
 
     while True:
