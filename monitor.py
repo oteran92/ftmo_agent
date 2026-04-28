@@ -10,11 +10,11 @@ No MT5 required for monitoring — only for trade execution.
 Required environment variables:
   TWELVEDATA_API_KEY    — TwelveData free plan key
   ANTHROPIC_API_KEY     — Claude API key (for trade journal analysis)
+  MS_CLIENT_ID          — Azure app client ID (public client, no secret needed)
   MS_TENANT_ID          — Microsoft 365 tenant ID
-  MS_CLIENT_ID          — Azure app client ID
-  MS_CLIENT_SECRET      — Azure app client secret
-  ALERT_EMAIL_FROM      — sender email (e.g. o.teran@silentgliss.com)
-  ALERT_EMAIL_TO        — recipient email (same or different)
+  MS_REFRESH_TOKEN      — OAuth2 refresh token for vote@eroica.io (auto-rotates)
+  ALERT_EMAIL_FROM      — sender email (vote@eroica.io)
+  ALERT_EMAIL_TO        — recipient email
 """
 
 from __future__ import annotations
@@ -59,28 +59,55 @@ def _is_h4_check_time(now: datetime) -> bool:
 
 # ── Microsoft Graph email ──────────────────────────────────────────────────────
 
-def _get_ms_token() -> str | None:
-    """Obtain OAuth2 bearer token via client credentials flow."""
-    tenant_id     = os.environ.get("MS_TENANT_ID", "")
-    client_id     = os.environ.get("MS_CLIENT_ID", "")
-    client_secret = os.environ.get("MS_CLIENT_SECRET", "")
+# File where the rotating refresh token is persisted between restarts.
+# The env var MS_REFRESH_TOKEN is used on first boot; subsequent boots read this file.
+_RT_FILE = DATA_DIR / ".ms_refresh_token"
 
-    if not all([tenant_id, client_id, client_secret]):
+
+def _load_refresh_token() -> str:
+    """Return the current refresh token, preferring the persisted file over env."""
+    if _RT_FILE.exists():
+        return _RT_FILE.read_text().strip()
+    return os.environ.get("MS_REFRESH_TOKEN", "")
+
+
+def _save_refresh_token(token: str) -> None:
+    """Persist the new refresh token so the next restart can use it."""
+    DATA_DIR.mkdir(exist_ok=True)
+    _RT_FILE.write_text(token)
+
+
+def _get_ms_token() -> str | None:
+    """
+    Obtain an OAuth2 access token via the refresh-token grant (public client flow).
+    Microsoft public clients do NOT require a client_secret.
+    Automatically rotates the stored refresh token on each successful call.
+    """
+    client_id = os.environ.get("MS_CLIENT_ID", "")
+    tenant_id = os.environ.get("MS_TENANT_ID", "")
+    refresh_token = _load_refresh_token()
+
+    if not all([client_id, tenant_id, refresh_token]):
         return None  # email not configured — skip silently
 
     try:
         resp = requests.post(
             f"https://login.microsoftonline.com/{tenant_id}/oauth2/v2.0/token",
             data={
-                "grant_type":    "client_credentials",
+                "grant_type":    "refresh_token",
                 "client_id":     client_id,
-                "client_secret": client_secret,
-                "scope":         "https://graph.microsoft.com/.default",
+                "refresh_token": refresh_token,
+                "scope":         "https://graph.microsoft.com/Mail.Send offline_access",
             },
             timeout=10,
         )
         resp.raise_for_status()
-        return resp.json().get("access_token")
+        data = resp.json()
+        # Rotate: save the new refresh token Microsoft returns
+        new_rt = data.get("refresh_token", "")
+        if new_rt:
+            _save_refresh_token(new_rt)
+        return data.get("access_token")
     except Exception as e:
         print(f"[Monitor] MS token error: {e}", flush=True)
         return None
