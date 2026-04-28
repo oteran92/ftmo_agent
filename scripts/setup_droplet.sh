@@ -23,18 +23,23 @@ else
     exit 1
 fi
 
-# ── Extract current refresh token from MSAL cache (no manual steps needed) ──────
-MS_REFRESH_TOKEN=$(python3 -c "
-import json
+# ── Extract current refresh token from MSAL cache ────────────────────────────────
+# Uses MS_ACCOUNT_ID_PREFIX from .env to find the right account in the MSAL cache.
+# Falls back to MS_REFRESH_TOKEN if already set in .env.
+if [ -z "${MS_REFRESH_TOKEN:-}" ] && [ -n "${MS_ACCOUNT_ID_PREFIX:-}" ]; then
+    MS_REFRESH_TOKEN=$(python3 -c "
+import json, os
+prefix = os.environ.get('MS_ACCOUNT_ID_PREFIX', '')
 try:
-    cache = json.load(open('$HOME/.m365_mcp_token_cache.json'))
+    cache = json.load(open(os.path.expanduser('~/.m365_mcp_token_cache.json')))
     for v in cache.get('RefreshToken', {}).values():
-        if '121bab41' in v.get('home_account_id', ''):
+        if v.get('home_account_id', '').startswith(prefix):
             print(v.get('secret', ''))
             break
-except Exception as e:
-    print('')
+except Exception:
+    pass
 " 2>/dev/null)
+fi
 
 if [ -z "$MS_REFRESH_TOKEN" ]; then
     echo "[WARN] Could not extract MS refresh token — email alerts will be disabled"
@@ -83,15 +88,15 @@ python3 -m venv /opt/ftmo_venv
 
 echo ""
 echo "=== Step 4: Create .env on server ==="
-# Write .env using printf to avoid heredoc quoting issues with special chars
+# All values come from local .env (sourced above) — no hardcoded credentials in this script
 run_remote "printf '%s\n' \
 'ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}' \
 'TWELVEDATA_API_KEY=${TWELVEDATA_API_KEY}' \
-'MS_CLIENT_ID=a47b745d-3383-4e35-81d2-5629063bd358' \
-'MS_TENANT_ID=bb39cf77-e2e2-403c-a430-7cbc12114f78' \
+'MS_CLIENT_ID=${MS_CLIENT_ID}' \
+'MS_TENANT_ID=${MS_TENANT_ID}' \
 'MS_REFRESH_TOKEN=${MS_REFRESH_TOKEN}' \
-'ALERT_EMAIL_FROM=vote@eroica.io' \
-'ALERT_EMAIL_TO=vote@eroica.io' \
+'ALERT_EMAIL_FROM=${ALERT_EMAIL_FROM}' \
+'ALERT_EMAIL_TO=${ALERT_EMAIL_TO}' \
 > /opt/ftmo_agent/.env"
 echo "[OK] .env created on server"
 

@@ -12,8 +12,8 @@ Required environment variables:
   ANTHROPIC_API_KEY     — Claude API key (for trade journal analysis)
   MS_CLIENT_ID          — Azure app client ID (public client, no secret needed)
   MS_TENANT_ID          — Microsoft 365 tenant ID
-  MS_REFRESH_TOKEN      — OAuth2 refresh token for vote@eroica.io (auto-rotates)
-  ALERT_EMAIL_FROM      — sender email (vote@eroica.io)
+  MS_REFRESH_TOKEN      — OAuth2 refresh token for the sender account (auto-rotates on use)
+  ALERT_EMAIL_FROM      — sender email address
   ALERT_EMAIL_TO        — recipient email
 """
 
