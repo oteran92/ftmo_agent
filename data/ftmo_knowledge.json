@@ -1,0 +1,199 @@
+{
+  "source": "Compiled from FTMO Academy, PropJournal, TradersBrain, CoinLaw, TradeLikeMaster — April 2026",
+  "last_updated": "2026-04-27",
+
+  "pass_rates": {
+    "phase_1_only": "20-25%",
+    "both_phases_combined": "10-12%",
+    "ever_receive_payout": "7-9%",
+    "true_success_rate": "1-2% of all who start",
+    "key_insight": "75% fail Phase 1. Primary killer is max drawdown, NOT profit target."
+  },
+
+  "risk_per_trade_vs_pass_rate": {
+    "0.5pct": {"pass_rate": "67%", "label": "Ultra-conservative — highest success"},
+    "1.0pct": {"pass_rate": "35%", "label": "Conservative — sustainable"},
+    "2.0pct": {"pass_rate": "12-15%", "label": "Moderate — high stress"},
+    "3.0pct": {"pass_rate": "5%", "label": "Aggressive — account blown in days"},
+    "agent_rule": "LOCK at 0.5% ($500 on $100k). This is non-negotiable."
+  },
+
+  "why_traders_fail": {
+    "data_source": "Community surveys + TSB user tracking",
+    "breakdown": [
+      {"reason": "Hit maximum total loss limit (10%)", "pct": 50, "agent_action": "Monitor total drawdown in real-time. Alert at 4%, halt at 8%."},
+      {"reason": "Hit daily loss limit (5%)", "pct": 20, "agent_action": "Track daily P&L before every trade. Halt at $800 soft stop, hard stop at $1000."},
+      {"reason": "Ran out of time", "pct": 15, "note": "No longer relevant — FTMO removed time limit in 2024."},
+      {"reason": "Rule violation (news, overnight, etc.)", "pct": 8, "agent_action": "Block trades 30min before/after high-impact news. Never bypass this."},
+      {"reason": "Abandoned / gave up", "pct": 5, "note": "Psychology failure. Agent provides accountability."}
+    ],
+    "behavioral_failure_patterns": [
+      {
+        "pattern": "Revenge Trading",
+        "pct_of_failures": 30,
+        "description": "After a loss, immediately entering another trade 2-3x bigger to recover. This is the #1 kill pattern.",
+        "signature": "Lot size spike after consecutive losses",
+        "agent_rule": "After 2 consecutive losses: HALT for 24h. No exceptions. Agent enforces this mechanically."
+      },
+      {
+        "pattern": "Overtrading Day 1",
+        "description": "Taking 5-10 trades on day 1. Hits daily loss limit. Spends rest of challenge recovering.",
+        "agent_rule": "Max 1-2 trades per day. Quality over quantity. Agent requires review_trade before every entry."
+      },
+      {
+        "pattern": "Moving Stop Losses",
+        "description": "Moving SL from 30 to 50 pips when trade goes against you. Doubles risk. Kills daily budget.",
+        "agent_rule": "SL is set at entry and NEVER moved further away. Only trail in profit direction."
+      },
+      {
+        "pattern": "News Trading Without Plan",
+        "description": "NFP, FOMC, CPI create massive volatility. One spike can wipe days of progress.",
+        "agent_rule": "No trades within 30min of high-impact news. Agent blocks this automatically."
+      },
+      {
+        "pattern": "Phase 2 Overconfidence",
+        "description": "60% of Phase 1 passers fail Phase 2 because they become reckless after proving they can do it.",
+        "agent_rule": "In Phase 2: DROP risk to 0.5% per trade. Only need 10 winning trades at 2:1 RRR. Patience wins."
+      },
+      {
+        "pattern": "Hitting Profit Target Too Fast",
+        "description": "Hitting 10% in 4 days from 1-2 large trades. FTMO flags this as inconsistent — funded account can be refused.",
+        "agent_rule": "Consistency is required. No single day should account for >30% of total challenge profit. Spread across minimum 4+ trading days."
+      },
+      {
+        "pattern": "Weekend Gap Risk",
+        "description": "Holding positions over Friday close. Monday gap can breach daily limit before reaction.",
+        "agent_rule": "Alert user if holding position into Friday 20:00. Recommend closing or sizing down to survive 2% gap."
+      },
+      {
+        "pattern": "Not Tracking Real-Time Drawdown",
+        "description": "Checking dashboard once a day. By then the violation already happened.",
+        "agent_rule": "Agent tracks daily P&L in real-time via MT5 bridge. User gets warning at 70% and 90% of daily limit."
+      }
+    ]
+  },
+
+  "ftmo_rule_mechanics": {
+    "daily_loss_limit": {
+      "pct": 5,
+      "on_100k": "$5,000",
+      "calculated_from": "PREVIOUS day's closing balance — NOT current equity",
+      "trap": "If your account was $102k at midnight and you lose $5,100 intraday, limit triggered even if you were up earlier.",
+      "our_soft_stop": "$800 (0.8%) — agent halts trading at this level",
+      "our_hard_stop": "$1,000 (1.0%) — absolute limit, 2 trades max"
+    },
+    "max_total_drawdown": {
+      "pct": 10,
+      "on_100k": "$10,000",
+      "floor": "$90,000 — account can NEVER go below this, even intraday",
+      "calculated_from": "Initial balance, not high water mark",
+      "trap": "If account grows to $108k and you give back $18,001, challenge is over.",
+      "our_crisis_threshold": "4% ($4,000) — crisis mode activates, lot size halved"
+    },
+    "profit_targets": {
+      "phase_1": "10% ($10,000 on $100k)",
+      "phase_2": "5% ($5,000 on $100k)",
+      "min_trading_days": 4,
+      "time_limit": "NONE as of 2024 — unlimited time"
+    },
+    "consistency_review": {
+      "description": "FTMO reviews trading BEHAVIOR after you pass — not just P&L",
+      "flags": [
+        "Single day accounting for >70% of total profits",
+        "Lot sizes changing dramatically between phases",
+        "Trading only 1-2 days total",
+        "NFP/FOMC spike accounting for majority of profit",
+        "Strategy completely different from Phase 1 in Phase 2"
+      ],
+      "consequence": "Funded account refused or reduced allocation even after passing"
+    }
+  },
+
+  "optimal_strategy_criteria": {
+    "source": "FTMO Academy + funded trader data",
+    "timeframes": "Daily for trend bias + H4 for entry (matches our EMA system)",
+    "sessions": {
+      "trade": ["London (08:00-12:00 UTC)", "New York (13:00-17:00 UTC)"],
+      "avoid": "Asian session — low liquidity, patterns fail to follow through",
+      "overlap": "London/NY overlap (13:00-16:00 UTC) — highest quality setups"
+    },
+    "entry_requirements": [
+      "Higher timeframe trend alignment (D1)",
+      "Key S/R level or EMA confluence",
+      "Candle confirmation (engulfing, pin bar, inside bar)",
+      "Trading during London or New York session only",
+      "No high-impact news within 30 minutes"
+    ],
+    "position_management": {
+      "stop_loss": "Technical — never arbitrary. Placed at structure extreme.",
+      "take_profit": "Minimum 2:1 RRR. Prefer 3:1 when available.",
+      "never_do": "Move SL further away. Add to losing position. Average down.",
+      "allowed": "Trail SL to breakeven after 1:1 reached."
+    }
+  },
+
+  "risk_management_rules_of_thumb": {
+    "rule_of_thirds": {
+      "description": "Divide daily loss limit ($5,000) into 3 zones",
+      "zone_1": "0-$1,500 loss (0-1.5%): Trade normally, full size",
+      "zone_2": "$1,500-$3,000 loss (1.5-3%): Reduce position size 50%",
+      "zone_3": "$3,000-$5,000 loss (3-5%): STOP. Close positions. Day over.",
+      "agent_implementation": "Agent uses $800/$1000 soft/hard stops — more conservative than FTMO default"
+    },
+    "consecutive_loss_protocol": {
+      "1_loss":  "Continue normally. Review trade before next entry.",
+      "2_losses": "HALT for rest of day. No new positions. Mandatory review.",
+      "3_losses": "HALT for 24 hours. Crisis mode consideration.",
+      "agent_rule": "This is hard-coded. No override allowed."
+    },
+    "profit_protection": {
+      "after_1pct_daily_profit": "Consider stopping for the day — protect gains",
+      "after_2pct_daily_profit": "STRONGLY recommend stopping. You have secured value.",
+      "reasoning": "Most FTMO failures happen when traders keep trading after a good start and give everything back."
+    },
+    "max_trades_per_day": {
+      "recommended": "1-2 high-quality setups",
+      "maximum": 3,
+      "reasoning": "More trades = more chances to hit daily limit. Quality over quantity."
+    }
+  },
+
+  "agent_intelligence_upgrades": {
+    "pre_trade_checks": [
+      "Is daily loss budget available? (reject if <$300 remaining)",
+      "Are there 2 consecutive losses today? (halt if yes)",
+      "Is there high-impact news within 30min? (reject if yes)",
+      "Is total drawdown within safe zone? (<4% green, 4-6% caution, >6% crisis)",
+      "Is this trade consistent with today's session? (London/NY only)",
+      "Does RRR meet minimum 2:1? (reject if below)",
+      "Is lot size within 0.5% risk rule? (auto-calculate and enforce)",
+      "Is it Friday after 18:00? (warn about weekend gap risk)"
+    ],
+    "behavioral_warnings": [
+      "Lot size increased after a loss? (revenge trading alert)",
+      "More than 2 trades today? (overtrading alert)",
+      "Same pair attempted 3x in one day? (fixation alert)",
+      "Daily profit already >1%? (recommend stopping for the day)",
+      "Trying to trade during Asian session? (low-probability alert)"
+    ],
+    "phase_specific_adjustments": {
+      "trial": "Validate process. 5-7 trades. Rules > profit.",
+      "challenge_phase_1": "Risk 0.5%. Need $10k. ~20 winning trades at 2:1. Patient.",
+      "challenge_phase_2": "Drop to 0.5% risk. Need $5k. Only 10 winning trades. Even more patient.",
+      "funded": "Preserve account. Consistency is everything. FTMO monitors behavior."
+    }
+  },
+
+  "what_successful_ftmo_traders_do": [
+    "Risk 0.5% per trade — always. No exceptions for 'high conviction' setups.",
+    "Trade only 1-2 sessions per day (London or New York, not both)",
+    "Take 1-2 trades max per day, even on great days",
+    "Stop trading after hitting 1-1.5% daily profit",
+    "After any loss: mandatory review before next trade",
+    "After 2 losses: done for the day, no argument",
+    "Never move SL further away from entry",
+    "Close all positions Friday before 20:00 (weekend gap risk)",
+    "Keep a trade journal — record setup, session, news proximity, emotional state",
+    "Treat Phase 2 with MORE caution than Phase 1, not less"
+  ]
+}

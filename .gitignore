@@ -1,0 +1,23 @@
+# Environment — never commit secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Data files — local state, not for version control
+data/account_state.json
+data/trade_log.json
+data/alerts.json
+data/monitor.log
+data/known_closed_trades.json
+data/trade_lessons.json
+
+# macOS
+.DS_Store
+
+# Cursor
+.cursor/

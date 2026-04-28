@@ -1,0 +1,69 @@
+{
+  "stage": 1,
+  "name": "Free Trial Validation",
+  "account_type": "$100k FTMO Free Trial Swing 2-Step",
+  "duration_days": 7,
+  "start_date": "2026-04-27",
+  "end_date": "2026-05-04",
+
+  "goal": "Validate the process — NOT profit. Learn to execute the methodology without breaking rules.",
+
+  "success_criteria": {
+    "min_trades": 5,
+    "max_trades": 10,
+    "rules_broken": 0,
+    "min_rrr_per_trade": 2.0,
+    "max_daily_loss_pct": 1.0,
+    "description": "Pass if: all trades reviewed by agent before entry, no rule breaks, RRR >= 2:1 on every trade"
+  },
+
+  "what_we_are_NOT_trying_to_do": [
+    "Hit 10% profit target (that is Phase 1 of the paid challenge)",
+    "Trade as many times as possible",
+    "Recover losses with bigger positions",
+    "Trade during high-impact news"
+  ],
+
+  "questions_to_answer_before_paying": [
+    "Can I follow the entry rules without emotion?",
+    "Do I accept when the agent says NO-GO?",
+    "Can I hold a trade to TP without closing early?",
+    "Is the workflow agent + MT5 comfortable and fast enough?"
+  ],
+
+  "decision_after_stage_1": {
+    "if_all_rules_followed": "Pay for FTMO $25,000 Swing Challenge (~$50). Same rules, lower cost. Reimbursed when funded.",
+    "if_rules_broken": "Stay on free demo 2 more weeks. Do not pay until process is clean.",
+    "skip_100k_for_now": "Start with $25k, pass it, scale up. Do not pay $155 before validating."
+  },
+
+  "strategy": {
+    "name": "EMA Trend + Pullback",
+    "pairs": ["EURUSD", "GBPUSD", "XAUUSD"],
+    "timeframes": {
+      "trend": "D1 — EMA50 defines bias (above = long only, below = short only)",
+      "setup": "H4 — wait for pullback to EMA20",
+      "entry": "H4 — confirmation candle at EMA20 (engulfing or pin bar)"
+    },
+    "rules": {
+      "entry": "Only trade in the direction of D1 EMA50 trend",
+      "sl": "Below/above the pullback candle extreme",
+      "tp": "Minimum 2x SL distance (2:1 RRR)",
+      "risk_per_trade": "0.5% ($500 on $100k)",
+      "max_trades_per_day": 1,
+      "no_trade_conditions": [
+        "Within 30 min of high-impact news",
+        "2 consecutive losses in a day",
+        "Daily loss > $800 (soft stop)",
+        "Agent returns NO-GO verdict"
+      ]
+    }
+  },
+
+  "next_stage": {
+    "stage": 2,
+    "name": "FTMO $25k Swing Challenge",
+    "trigger": "Stage 1 success criteria met + decision to pay",
+    "objectives": "TBD after Stage 1 completion"
+  }
+}
