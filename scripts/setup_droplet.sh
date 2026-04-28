@@ -6,7 +6,7 @@
 
 set -e
 
-DROPLET_IP="134.209.199.189"
+DROPLET_IP="165.22.25.204"
 REPO_URL="https://github.com/oteran92/ftmo_agent"
 
 echo "=== FTMO Monitor — Droplet Setup ==="
