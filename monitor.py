@@ -204,6 +204,11 @@ def run_check() -> dict:
                 alert["action_required"] = True
             elif sig == "WATCH":
                 entry["note"] = r.get("next_step", "In zone, awaiting confirmation")
+            elif sig == "NEWS_CAUTION":
+                entry["note"] = r.get("next_step", "")
+                entry["news"] = r.get("news", {}).get("message", "")
+            elif sig == "NEWS_BLOCK":
+                entry["note"] = r.get("next_step", "")
 
             alert["signals"].append(entry)
     except Exception as e:
@@ -223,6 +228,9 @@ def run_check() -> dict:
     if actionable:
         pairs_str = ", ".join(e["pair"] for e in actionable)
         alert["message"] = f"SETUP ALERT: {pairs_str} — actionable signal. Open MT5 and review."
+    elif any(s.get("signal") == "NEWS_CAUTION" for s in alert["signals"]):
+        caution = [s["pair"] for s in alert["signals"] if s.get("signal") == "NEWS_CAUTION"]
+        alert["message"] = f"NEWS CAUTION: {', '.join(caution)} have valid setups blocked by upcoming major news. Wait for event to pass."
     elif any(s.get("signal") == "WATCH" for s in alert["signals"]):
         watch = [s["pair"] for s in alert["signals"] if s.get("signal") == "WATCH"]
         alert["message"] = f"WATCH: {', '.join(watch)} approaching setup zone. No action yet."
@@ -254,6 +262,8 @@ def _build_email_body(alert: dict) -> str:
                 f"    → Entry: {t['entry']} | SL: {t['sl']} | TP: {t['tp']} | "
                 f"SL: {t['sl_pips']}p | TP: {t['tp_pips']}p | RRR: {t['rrr']}"
             )
+        if s.get("news"):
+            lines.append(f"    ⚠ {s['news']}")
 
     if alert.get("new_lessons"):
         lines += ["", "NEW TRADE LESSONS:"]
@@ -302,9 +312,12 @@ def main() -> None:
 
                 print(f"[Monitor] {alert['message']}", flush=True)
 
-                # Send email for actionable signals and WATCH alerts
+                # Send email for actionable signals, CAUTION alerts, and WATCH alerts
                 if alert["action_required"]:
                     subject = f"FTMO SETUP: {alert['message'][:60]}"
+                    send_email_alert(subject, _build_email_body(alert))
+                elif any(s.get("signal") == "NEWS_CAUTION" for s in alert["signals"]):
+                    subject = f"FTMO NEWS CAUTION: {alert['message'][:60]}"
                     send_email_alert(subject, _build_email_body(alert))
                 elif any(s.get("signal") == "WATCH" for s in alert["signals"]):
                     subject = f"FTMO WATCH: {alert['message'][:60]}"

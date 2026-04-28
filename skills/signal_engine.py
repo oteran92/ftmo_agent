@@ -343,6 +343,28 @@ def analyze_setup(symbol: str = "EURUSD") -> dict[str, Any]:
             f"Live: {round(effective_price,5)}. Wait for pullback."
         )
 
+    # ── News filter: check calendar AFTER building the technical signal ─────────
+    # Runs last so technical analysis is always complete regardless of news.
+    try:
+        from skills.news_filter import check_news_block
+        news = check_news_block(sym)
+        result["news"] = news
+
+        if news["status"] == "BLOCK" and signal in ("GO_LONG", "GO_SHORT", "WATCH"):
+            # Override: hard block — active news window
+            result["signal"]    = "NEWS_BLOCK"
+            result["next_step"] = f"Entry blocked — {news['message']}"
+
+        elif news["status"] == "CAUTION" and signal in ("GO_LONG", "GO_SHORT"):
+            # Downgrade GO → NEWS_CAUTION — setup is valid but entry is risky before major news
+            result["signal"]    = "NEWS_CAUTION"
+            result["next_step"] = (
+                f"Setup valid ({signal}) but entry NOT recommended — {news['message']}. "
+                f"Wait until after the event, then re-evaluate."
+            )
+    except Exception:
+        pass  # news filter is non-critical — never block a result over a calendar fetch error
+
     return result
 
 
