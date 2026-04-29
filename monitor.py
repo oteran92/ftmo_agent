@@ -270,6 +270,13 @@ def _build_email_body(alert: dict) -> str:
         for l in alert["new_lessons"]:
             lines.append(f"  [{l.get('pair')} {l.get('outcome')}] {l.get('lesson')}")
 
+    # Challenge progress dashboard — appended to every email
+    try:
+        from skills.challenge_tracker import format_email_block
+        lines.append(format_email_block())
+    except Exception:
+        pass
+
     lines += ["", "— FTMO Agent"]
     return "\n".join(lines)
 
