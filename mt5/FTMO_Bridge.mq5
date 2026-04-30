@@ -3,14 +3,17 @@
 //| File-based bridge between Python (FTMO Agent) and MT5            |
 //| Writes JSON files to MQL5/Files; reads commands.json for orders  |
 //| Symbol can be overridden by bridge_config.json (programmatic)    |
+//| v1.2: Auto-breakeven manager — moves SL to entry at 1:1 RR      |
 //+------------------------------------------------------------------+
 #property copyright "FTMO Agent"
-#property version   "1.1"
+#property version   "1.2"
 
-input string  TradingSymbol    = "EURUSD";  // Symbol to monitor (overridden by bridge_config.json)
-input int     WriteIntervalSec = 1;         // Price write interval (seconds)
-input bool    EnableTrading    = true;      // Allow order execution via commands.json
-input bool    DetailedLogging  = true;      // Print debug logs to Journal
+input string  TradingSymbol       = "EURUSD"; // Symbol to monitor (overridden by bridge_config.json)
+input int     WriteIntervalSec    = 1;         // Price write interval (seconds)
+input bool    EnableTrading       = true;      // Allow order execution via commands.json
+input bool    DetailedLogging     = true;      // Print debug logs to Journal
+input bool    AutoBreakeven       = true;      // Auto-move SL to entry when profit >= SL distance
+input double  BreakevenBufferPips = 2.0;       // Extra pips buffer added to entry when moving SL
 
 // Active symbol — may be overridden at runtime from bridge_config.json
 string ActiveSymbol = "";
@@ -127,6 +130,7 @@ void OnTimer()
     if(EnableTrading && MQLInfoInteger(MQL_TRADE_ALLOWED) && TerminalInfoInteger(TERMINAL_TRADE_ALLOWED))
     {
         CheckTradeCommands();
+        if(AutoBreakeven) CheckAutoBreakeven();
     }
 }
 
@@ -389,6 +393,80 @@ long ExtractLng(string json, string key)
     if(e < 0 || (e2 >= 0 && e2 < e)) e = e2;
     if(e < 0) return 0;
     return StringToInteger(StringSubstr(json, s, e - s));
+}
+
+//+------------------------------------------------------------------+
+//| Auto-Breakeven Manager                                           |
+//| Monitors all open positions. When a BUY position's current price |
+//| reaches entry + (entry - SL) [i.e. 1:1 RR achieved], the SL    |
+//| is automatically moved to entry + buffer pips.                   |
+//| For SELL positions, the mirror logic applies.                    |
+//+------------------------------------------------------------------+
+void CheckAutoBreakeven()
+{
+    int total = PositionsTotal();
+    for(int i = 0; i < total; i++)
+    {
+        ulong ticket = PositionGetTicket(i);
+        if(ticket <= 0 || !PositionSelectByTicket(ticket)) continue;
+
+        string sym    = PositionGetString(POSITION_SYMBOL);
+        long   ptype  = PositionGetInteger(POSITION_TYPE);
+        double entry  = PositionGetDouble(POSITION_PRICE_OPEN);
+        double sl     = PositionGetDouble(POSITION_SL);
+        double tp     = PositionGetDouble(POSITION_TP);
+        double cur    = PositionGetDouble(POSITION_PRICE_CURRENT);
+
+        // Skip if SL already at or above entry (breakeven already set)
+        if(sl <= 0 || tp <= 0) continue;
+
+        double pip     = SymbolInfoDouble(sym, SYMBOL_POINT) * 10;
+        double buffer  = BreakevenBufferPips * pip;
+
+        if(ptype == POSITION_TYPE_BUY)
+        {
+            double sl_dist  = entry - sl;                // distance from entry to SL
+            double trigger  = entry + sl_dist;           // price that gives 1:1 RR
+            double new_sl   = entry + buffer;            // breakeven SL with small buffer
+
+            // Only move if SL is still below entry and price reached trigger
+            if(sl < entry && cur >= trigger)
+            {
+                MqlTradeRequest req; ZeroMemory(req);
+                MqlTradeResult  res; ZeroMemory(res);
+                req.action   = TRADE_ACTION_SLTP;
+                req.position = ticket;
+                req.symbol   = sym;
+                req.sl       = NormalizeDouble(new_sl, (int)SymbolInfoInteger(sym, SYMBOL_DIGITS));
+                req.tp       = tp;
+                bool ok = OrderSend(req, res) && res.retcode == TRADE_RETCODE_DONE;
+                Print("AutoBreakeven BUY ", sym, " #", ticket,
+                      " | entry=", entry, " trigger=", trigger,
+                      " | SL moved to ", new_sl, " | ", (ok ? "OK" : "FAIL"));
+            }
+        }
+        else if(ptype == POSITION_TYPE_SELL)
+        {
+            double sl_dist  = sl - entry;
+            double trigger  = entry - sl_dist;
+            double new_sl   = entry - buffer;
+
+            if(sl > entry && cur <= trigger)
+            {
+                MqlTradeRequest req; ZeroMemory(req);
+                MqlTradeResult  res; ZeroMemory(res);
+                req.action   = TRADE_ACTION_SLTP;
+                req.position = ticket;
+                req.symbol   = sym;
+                req.sl       = NormalizeDouble(new_sl, (int)SymbolInfoInteger(sym, SYMBOL_DIGITS));
+                req.tp       = tp;
+                bool ok = OrderSend(req, res) && res.retcode == TRADE_RETCODE_DONE;
+                Print("AutoBreakeven SELL ", sym, " #", ticket,
+                      " | entry=", entry, " trigger=", trigger,
+                      " | SL moved to ", new_sl, " | ", (ok ? "OK" : "FAIL"));
+            }
+        }
+    }
 }
 
 //+------------------------------------------------------------------+
