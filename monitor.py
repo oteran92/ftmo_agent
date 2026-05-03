@@ -58,6 +58,22 @@ def _is_h4_check_time(now: datetime) -> bool:
     return now.hour in H4_CLOSE_HOURS_CEST and now.minute == H4_CHECK_MINUTE
 
 
+def _market_is_open(now: datetime) -> bool:
+    """
+    Forex market is closed Saturday and most of Sunday.
+    Opens Sunday ~23:00 CEST (21:00 UTC, New York open).
+    Closes Friday ~22:00 CEST.
+    """
+    weekday = now.weekday()  # 0=Mon … 4=Fri, 5=Sat, 6=Sun
+    if weekday == 5:          # Saturday — always closed
+        return False
+    if weekday == 6 and now.hour < 23:  # Sunday before 23:00 CEST
+        return False
+    if weekday == 4 and now.hour >= 22:  # Friday after 22:00 CEST
+        return False
+    return True
+
+
 # ── Microsoft Graph email ──────────────────────────────────────────────────────
 
 # File where the rotating refresh token is persisted between restarts.
@@ -308,6 +324,13 @@ def main() -> None:
 
             if _is_h4_check_time(now) and now.hour != last_check_hour:
                 last_check_hour = now.hour
+
+                # Skip scans when forex market is closed (weekends)
+                if not _market_is_open(now):
+                    print(f"[Monitor] {_now_str()} — Market closed (weekend). Skipping scan.", flush=True)
+                    time.sleep(POLL_INTERVAL)
+                    continue
+
                 print(f"\n[Monitor] {_now_str()} — H4 close detected, running check...", flush=True)
 
                 alert = run_check()
