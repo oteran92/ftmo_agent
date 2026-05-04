@@ -63,11 +63,16 @@ def _market_is_open(now: datetime) -> bool:
     Forex market is closed Saturday and most of Sunday.
     Opens Sunday ~23:00 CEST (21:00 UTC, New York open).
     Closes Friday ~22:00 CEST.
+
+    The Sunday 23:03 scan is intentionally skipped because TwelveData
+    returns stale Friday close data. The first reliable scan is Monday 03:03.
     """
     weekday = now.weekday()  # 0=Mon … 4=Fri, 5=Sat, 6=Sun
     if weekday == 5:          # Saturday — always closed
         return False
-    if weekday == 6 and now.hour < 23:  # Sunday before 23:00 CEST
+    if weekday == 6:          # Sunday — skip all scans (stale data risk)
+        return False
+    if weekday == 0 and now.hour < 3:  # Monday before 03:00 — still unreliable
         return False
     if weekday == 4 and now.hour >= 22:  # Friday after 22:00 CEST
         return False
