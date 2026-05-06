@@ -262,381 +262,354 @@ def run_check() -> dict:
 
 
 def _build_email_body(alert: dict) -> str:
-    """Format alert dict into a clean, elegant HTML email."""
+    """Format alert dict into a minimal, professional HTML email."""
 
-    # ── signal metadata ────────────────────────────────────────────────────────
-    SIG_META = {
-        "GO_LONG":      {"color": "#0a7c42", "light": "#eaf7ef", "icon": "▲", "label": "GO LONG"},
-        "GO_SHORT":     {"color": "#c0392b", "light": "#fdf0ef", "icon": "▼", "label": "GO SHORT"},
-        "WATCH":        {"color": "#b07d00", "light": "#fffbf0", "icon": "◉", "label": "WATCH"},
-        "NEWS_CAUTION": {"color": "#c05a00", "light": "#fff4ec", "icon": "⚠", "label": "NEWS CAUTION"},
-        "NEWS_BLOCK":   {"color": "#8b1a1a", "light": "#fdf0ef", "icon": "✕", "label": "NEWS BLOCK"},
-        "WAIT":         {"color": "#8a8a8a", "light": "#f7f7f7", "icon": "·", "label": "NO SETUP"},
+    # ── signal colour map ──────────────────────────────────────────────────────
+    # (accent bar colour, badge bg, badge text)
+    SIG_STYLE = {
+        "GO_LONG":      ("#16a34a", "#dcfce7", "#15803d"),
+        "GO_SHORT":     ("#dc2626", "#fee2e2", "#b91c1c"),
+        "WATCH":        ("#d97706", "#fef3c7", "#92400e"),
+        "NEWS_CAUTION": ("#ea580c", "#ffedd5", "#9a3412"),
+        "NEWS_BLOCK":   ("#dc2626", "#fce7f3", "#9d174d"),
+        "WAIT":         ("#9ca3af", "#f3f4f6", "#6b7280"),
     }
 
-    # Dominant signal priority
-    PRIORITY = ["GO_LONG", "GO_SHORT", "NEWS_BLOCK", "NEWS_CAUTION", "WATCH", "WAIT"]
+    # Dominant signal determines the top accent bar
     dominant = "WAIT"
     for s in alert.get("signals", []):
         sig = s.get("signal", "WAIT")
-        if PRIORITY.index(sig if sig in PRIORITY else "WAIT") < PRIORITY.index(dominant):
+        if sig in ("GO_LONG", "GO_SHORT"):
+            dominant = sig
+            break
+        if sig == "WATCH" and dominant == "WAIT":
+            dominant = "WATCH"
+        if sig in ("NEWS_CAUTION", "NEWS_BLOCK") and dominant == "WAIT":
             dominant = sig
 
-    meta     = SIG_META.get(dominant, SIG_META["WAIT"])
-    acc      = meta["color"]    # accent color
-    acc_bg   = meta["light"]    # tinted background
-    is_action = dominant in ("GO_LONG", "GO_SHORT")
+    accent_color = SIG_STYLE[dominant][0]
 
-    # ── inline badge ───────────────────────────────────────────────────────────
+    STATUS_TITLE = {
+        "GO_LONG":      "Action Required",
+        "GO_SHORT":     "Action Required",
+        "WATCH":        "Watching",
+        "NEWS_CAUTION": "News Caution",
+        "NEWS_BLOCK":   "News Block",
+        "WAIT":         "No Setup",
+    }
+    STATUS_SUB = {
+        "GO_LONG":      "GO LONG signal confirmed",
+        "GO_SHORT":     "GO SHORT signal confirmed",
+        "WATCH":        "Approaching setup zone — no entry yet",
+        "NEWS_CAUTION": "Valid setup but major news event soon",
+        "NEWS_BLOCK":   "Trading paused due to high-impact news",
+        "WAIT":         "Capital protected · All pairs in wait",
+    }
+
     def badge(sig: str) -> str:
-        m = SIG_META.get(sig, SIG_META["WAIT"])
+        _, bg, fg = SIG_STYLE.get(sig, SIG_STYLE["WAIT"])
+        label = sig.replace("_", " ")
         return (
-            f'<span style="display:inline-block;background:{m["light"]};color:{m["color"]};'
-            f'border:1px solid {m["color"]}33;padding:2px 7px;border-radius:3px;'
-            f'font-size:10px;font-weight:700;letter-spacing:.5px;'
-            f'font-family:monospace;">{sig}</span>'
+            f'<span style="display:inline-block;background:{bg};color:{fg};'
+            f'padding:2px 7px;border-radius:3px;font-size:10px;font-weight:700;'
+            f'letter-spacing:.4px;font-family:monospace;">{label}</span>'
         )
 
     def bias_pill(bias: str) -> str:
         if bias == "LONG":
-            return ('<span style="color:#0a7c42;font-size:12px;font-weight:700;">'
-                    '&#9650;&nbsp;LONG</span>')
+            return '<span style="color:#16a34a;font-weight:700;font-size:12px;">▲ LONG</span>'
         if bias == "SHORT":
-            return ('<span style="color:#c0392b;font-size:12px;font-weight:700;">'
-                    '&#9660;&nbsp;SHORT</span>')
-        return f'<span style="color:#aaa;font-size:12px;">{bias}</span>'
+            return '<span style="color:#dc2626;font-weight:700;font-size:12px;">▼ SHORT</span>'
+        return f'<span style="color:#9ca3af;font-size:12px;">{bias}</span>'
 
-    # ── pair rows (only non-WAIT, or WAIT if <5 non-WAIT) ─────────────────────
-    signals = alert.get("signals", [])
-    actionable = [s for s in signals if s.get("signal") in ("GO_LONG", "GO_SHORT")]
-    watch_sigs = [s for s in signals if s.get("signal") in ("WATCH", "NEWS_CAUTION", "NEWS_BLOCK")]
-    wait_sigs  = [s for s in signals if s.get("signal") not in
-                  ("GO_LONG", "GO_SHORT", "WATCH", "NEWS_CAUTION", "NEWS_BLOCK")]
+    # ── build pair rows ────────────────────────────────────────────────────────
+    pair_rows = ""
+    actionable_trades = []   # for the trade card below
 
-    # Show: actionable first, then watch, then wait (collapsed to save space)
-    display_sigs = actionable + watch_sigs + wait_sigs
-
-    pair_rows_html = ""
-    for s in display_sigs:
+    for s in alert.get("signals", []):
         sig   = s.get("signal", "WAIT")
         pair  = s.get("pair") or s.get("symbol") or "?"
         bias  = s.get("bias", "")
-        note  = s.get("note", "") or s.get("next_step", "")
+        note  = (s.get("note") or s.get("next_step") or "—")[:85]
         trade = s.get("trade")
-        news_msg = s.get("news", "")
-        m = SIG_META.get(sig, SIG_META["WAIT"])
-
-        # Left-border accent stripe — strong for actionable, subtle for wait
-        border_color = m["color"] if sig not in ("WAIT",) else "#e0e0e0"
-        row_bg = m["light"] if sig in ("GO_LONG", "GO_SHORT") else "#fff"
-
-        pair_rows_html += f"""
-            <tr style="border-bottom:1px solid #f0f0f0;">
-              <td style="padding:10px 0 10px 12px;border-left:3px solid {border_color};
-                         width:70px;">
-                <span style="font-family:monospace;font-size:13px;font-weight:700;
-                             color:#222;">{pair}</span>
-              </td>
-              <td style="padding:10px 8px;width:110px;">{badge(sig)}</td>
-              <td style="padding:10px 8px;width:70px;">{bias_pill(bias)}</td>
-              <td style="padding:10px 8px 10px 0;font-size:12px;color:#666;
-                         line-height:1.4;">{note[:85]}</td>
-            </tr>"""
-
         if trade:
-            t = trade
-            sl_pips = t.get("sl_pips", "")
-            tp_pips = t.get("tp_pips", "")
-            pair_rows_html += f"""
-            <tr style="background:{m['light']};border-bottom:1px solid #f0f0f0;">
-              <td colspan="4" style="padding:6px 12px 12px 15px;
-                                     border-left:3px solid {border_color};">
-                <table style="border-collapse:collapse;width:100%;">
-                  <tr>
-                    <td style="padding:0 20px 0 0;">
-                      <div style="font-size:10px;color:#999;text-transform:uppercase;
-                                  letter-spacing:.5px;margin-bottom:2px;">Entry</div>
-                      <div style="font-family:monospace;font-size:13px;font-weight:700;
-                                  color:#222;">{t.get("entry")}</div>
-                    </td>
-                    <td style="padding:0 20px 0 0;">
-                      <div style="font-size:10px;color:#999;text-transform:uppercase;
-                                  letter-spacing:.5px;margin-bottom:2px;">Stop Loss</div>
-                      <div style="font-family:monospace;font-size:13px;font-weight:700;
-                                  color:#c0392b;">{t.get("sl")}
-                        <span style="font-size:11px;font-weight:400;">({sl_pips}p)</span>
-                      </div>
-                    </td>
-                    <td style="padding:0 20px 0 0;">
-                      <div style="font-size:10px;color:#999;text-transform:uppercase;
-                                  letter-spacing:.5px;margin-bottom:2px;">Take Profit</div>
-                      <div style="font-family:monospace;font-size:13px;font-weight:700;
-                                  color:#0a7c42;">{t.get("tp")}
-                        <span style="font-size:11px;font-weight:400;">({tp_pips}p)</span>
-                      </div>
-                    </td>
-                    <td>
-                      <div style="font-size:10px;color:#999;text-transform:uppercase;
-                                  letter-spacing:.5px;margin-bottom:2px;">RRR</div>
-                      <div style="font-size:13px;font-weight:700;color:#222;">
-                        1&nbsp;:&nbsp;{t.get("rrr")}
-                      </div>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>"""
+            trade["pair"] = pair
+            trade["signal"] = sig
+            actionable_trades.append(trade)
 
-        if news_msg:
-            pair_rows_html += f"""
-            <tr style="border-bottom:1px solid #f0f0f0;">
-              <td colspan="4"
-                  style="padding:5px 12px 8px 15px;border-left:3px solid #c05a00;
-                         font-size:11px;color:#c05a00;background:#fffbf0;">
-                ⚠&nbsp; {news_msg}
-              </td>
-            </tr>"""
+        # Dim WAIT rows slightly
+        row_opacity = '1' if sig != "WAIT" else '0.7'
+        border = "border-bottom:1px solid #f3f4f6;"
 
-    # ── lessons ────────────────────────────────────────────────────────────────
-    lessons_html = ""
+        pair_rows += f"""
+      <tr style="opacity:{row_opacity};">
+        <td style="padding:11px 0 11px 20px;{border}">
+          <span style="font-weight:700;font-family:monospace;font-size:14px;
+                       color:#111;">{pair}</span>
+        </td>
+        <td style="padding:11px 8px;{border}">{badge(sig)}</td>
+        <td style="padding:11px 8px;{border}">{bias_pill(bias)}</td>
+        <td style="padding:11px 20px 11px 8px;{border}
+                   font-size:12px;color:#6b7280;line-height:1.4;">{note}</td>
+      </tr>"""
+
+    # ── trade setup card (only for GO signals) ─────────────────────────────────
+    trade_card = ""
+    for t in actionable_trades:
+        sig_color = "#16a34a" if t["signal"] == "GO_LONG" else "#dc2626"
+        direction = "LONG" if t["signal"] == "GO_LONG" else "SHORT"
+        trade_card += f"""
+    <div style="margin:0 20px 20px;background:#f8fafc;border-radius:6px;
+                border-left:3px solid {sig_color};padding:14px 16px;">
+      <div style="font-size:11px;font-weight:700;color:{sig_color};
+                  letter-spacing:.8px;margin-bottom:10px;">
+        TRADE SETUP — {t['pair']} {direction}
+      </div>
+      <table style="border-collapse:collapse;width:100%;">
+        <tr>
+          <td style="padding:0 16px 0 0;text-align:center;">
+            <div style="font-size:10px;color:#9ca3af;letter-spacing:.5px;
+                        margin-bottom:3px;">ENTRY</div>
+            <div style="font-size:17px;font-weight:700;font-family:monospace;
+                        color:#111;">{t.get('entry')}</div>
+          </td>
+          <td style="padding:0 16px;text-align:center;border-left:1px solid #e5e7eb;">
+            <div style="font-size:10px;color:#9ca3af;letter-spacing:.5px;
+                        margin-bottom:3px;">STOP LOSS</div>
+            <div style="font-size:17px;font-weight:700;font-family:monospace;
+                        color:#dc2626;">{t.get('sl')}</div>
+            <div style="font-size:11px;color:#9ca3af;">{t.get('sl_pips')} pips</div>
+          </td>
+          <td style="padding:0 16px;text-align:center;border-left:1px solid #e5e7eb;">
+            <div style="font-size:10px;color:#9ca3af;letter-spacing:.5px;
+                        margin-bottom:3px;">TAKE PROFIT</div>
+            <div style="font-size:17px;font-weight:700;font-family:monospace;
+                        color:#16a34a;">{t.get('tp')}</div>
+            <div style="font-size:11px;color:#9ca3af;">{t.get('tp_pips')} pips</div>
+          </td>
+          <td style="padding:0 0 0 16px;text-align:center;border-left:1px solid #e5e7eb;">
+            <div style="font-size:10px;color:#9ca3af;letter-spacing:.5px;
+                        margin-bottom:3px;">RRR</div>
+            <div style="font-size:17px;font-weight:700;font-family:monospace;
+                        color:#111;">1:{t.get('rrr')}</div>
+          </td>
+        </tr>
+      </table>
+    </div>"""
+
+    # ── news / lessons ─────────────────────────────────────────────────────────
+    extras = ""
+    for s in alert.get("signals", []):
+        if s.get("news"):
+            extras += (
+                f'<p style="margin:0 20px 8px;font-size:12px;color:#92400e;'
+                f'background:#fef3c7;padding:8px 12px;border-radius:4px;">'
+                f'⚠ {s.get("news","")[:100]}</p>'
+            )
     if alert.get("new_lessons"):
-        items = ""
+        extras += (
+            '<p style="margin:16px 20px 4px;font-size:11px;font-weight:700;'
+            'color:#6b7280;letter-spacing:.6px;text-transform:uppercase;">New Trade Lessons</p>'
+        )
         for lesson in alert["new_lessons"]:
             outcome = lesson.get("outcome", "")
-            oc = "#0a7c42" if outcome == "WIN" else "#c0392b"
-            items += f"""<div style="padding:6px 0;border-bottom:1px solid #f5f5f5;
-                                      font-size:12px;color:#444;">
-              <span style="color:{oc};font-weight:700;">[{lesson.get('pair')} {outcome}]</span>
-              &nbsp;{lesson.get('lesson','')[:130]}
-            </div>"""
-        lessons_html = f"""
-        <div style="margin:0 20px 16px;padding:14px;border:1px solid #e8e8e8;
-                    border-radius:6px;background:#fafafa;">
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;
-                      color:#aaa;font-weight:700;margin-bottom:8px;">New Trade Lessons</div>
-          {items}
-        </div>"""
+            c = "#16a34a" if outcome == "WIN" else "#dc2626"
+            extras += (
+                f'<p style="margin:2px 20px;font-size:12px;color:#374151;">'
+                f'<span style="color:{c};font-weight:700;">[{lesson.get("pair")} {outcome}]</span>'
+                f' {lesson.get("lesson","")[:110]}</p>'
+            )
 
-    # ── challenge tracker ──────────────────────────────────────────────────────
-    challenge_html = ""
+    # ── challenge mini-dashboard ───────────────────────────────────────────────
+    challenge_strip = ""
     try:
         from skills.challenge_tracker import get_dashboard
         d = get_dashboard()
-        profit_pct   = d.get("profit_pct", 0)
-        progress_pct = min(d.get("progress_pct", 0), 100)
-        balance      = d.get("balance", 0)
-        target       = d.get("target_usd", 110000)
-        remaining    = d.get("remaining_usd", 0)
-        daily_pct    = d.get("daily_loss_pct", 0)
-        total_pct    = d.get("total_loss_pct", 0)
-        days_done    = d.get("trading_days", 0)
-        wins         = d.get("trades_won", 0)
-        losses       = d.get("trades_lost", 0)
-        daily_pnl    = d.get("daily_pnl", 0)
-        phase        = d.get("phase", "DEMO")
-        bar_w        = int(progress_pct)
-        pc           = "#0a7c42" if profit_pct >= 0 else "#c0392b"
-        dpnl_c       = "#0a7c42" if daily_pnl >= 0 else "#c0392b"
-        daily_warn   = daily_pct > 70
-        total_warn   = total_pct > 60
+        bal      = d.get("balance", 0)
+        pct      = d.get("profit_pct", 0)
+        prog     = min(d.get("progress_pct", 0), 100)
+        wins     = d.get("trades_won", 0)
+        losses   = d.get("trades_lost", 0)
+        days     = d.get("trading_days", 0)
+        remaining = d.get("remaining_usd", 0)
+        d_pct    = d.get("daily_loss_pct", 0)
+        t_pct    = d.get("total_loss_pct", 0)
+        pct_color = "#16a34a" if pct >= 0 else "#dc2626"
+        d_warn   = d.get("daily_warning", False)
+        t_warn   = d.get("total_warning", False)
+        bar_w    = int(prog)
 
-        challenge_html = f"""
-        <div style="margin:0 20px 20px;border:1px solid #e8e8e8;border-radius:6px;
-                    overflow:hidden;">
-          <!-- tracker header -->
-          <div style="background:#f7f7f7;padding:10px 16px;border-bottom:1px solid #e8e8e8;">
-            <span style="font-size:10px;text-transform:uppercase;letter-spacing:1px;
-                         color:#888;font-weight:700;">FTMO Challenge</span>
-            <span style="font-size:11px;color:#bbb;margin-left:8px;">{phase}</span>
-          </div>
-          <!-- balance hero -->
-          <div style="padding:14px 16px 0;text-align:center;">
-            <div style="font-size:28px;font-weight:700;font-family:monospace;color:#222;">
-              ${balance:,.2f}
+        challenge_strip = f"""
+    <div style="margin:16px 20px 0;padding:16px;background:#f8fafc;
+                border-radius:6px;border:1px solid #e5e7eb;">
+      <div style="font-size:10px;font-weight:700;color:#9ca3af;
+                  letter-spacing:.8px;margin-bottom:12px;">FTMO CHALLENGE</div>
+      <!-- 4 stats -->
+      <table style="border-collapse:collapse;width:100%;margin-bottom:12px;">
+        <tr>
+          <td style="width:25%;text-align:center;padding:0 6px 0 0;">
+            <div style="font-size:18px;font-weight:700;font-family:monospace;
+                        color:#111;">${bal:,.0f}</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px;">Balance</div>
+          </td>
+          <td style="width:25%;text-align:center;padding:0 6px;
+                     border-left:1px solid #e5e7eb;">
+            <div style="font-size:18px;font-weight:700;font-family:monospace;
+                        color:{pct_color};">{pct:+.2f}%</div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px;">Profit</div>
+          </td>
+          <td style="width:25%;text-align:center;padding:0 6px;
+                     border-left:1px solid #e5e7eb;">
+            <div style="font-size:18px;font-weight:700;font-family:monospace;
+                        color:#111;">
+              <span style="color:#16a34a;">{wins}W</span>
+              <span style="color:#d1d5db;font-size:14px;">/</span>
+              <span style="color:#dc2626;">{losses}L</span>
             </div>
-            <div style="font-size:13px;color:{pc};font-weight:600;margin-top:2px;">
-              {profit_pct:+.2f}% &nbsp;·&nbsp; Target ${target:,.0f}
-            </div>
-          </div>
-          <!-- progress bar -->
-          <div style="padding:10px 16px 14px;">
-            <div style="display:flex;justify-content:space-between;
-                        font-size:10px;color:#aaa;margin-bottom:4px;">
-              <span>Progress to +10%</span>
-              <span style="color:{pc};font-weight:700;">{progress_pct:.1f}%</span>
-            </div>
-            <div style="background:#ebebeb;border-radius:3px;height:6px;">
-              <div style="background:{acc};border-radius:3px;height:6px;
-                          width:{bar_w}%;"></div>
-            </div>
-          </div>
-          <!-- stats grid -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;
-                      border-top:1px solid #f0f0f0;text-align:center;">
-            <div style="padding:10px 8px;border-right:1px solid #f0f0f0;">
-              <div style="font-size:10px;color:#aaa;text-transform:uppercase;
-                          letter-spacing:.5px;margin-bottom:3px;">Today</div>
-              <div style="font-size:13px;font-weight:700;color:{dpnl_c};
-                          font-family:monospace;">{daily_pnl:+,.0f}</div>
-            </div>
-            <div style="padding:10px 8px;border-right:1px solid #f0f0f0;">
-              <div style="font-size:10px;color:#aaa;text-transform:uppercase;
-                          letter-spacing:.5px;margin-bottom:3px;">Days</div>
-              <div style="font-size:13px;font-weight:700;color:#222;">
-                {days_done}<span style="font-size:10px;color:#bbb;">/4</span>
-              </div>
-            </div>
-            <div style="padding:10px 8px;border-right:1px solid #f0f0f0;">
-              <div style="font-size:10px;color:#aaa;text-transform:uppercase;
-                          letter-spacing:.5px;margin-bottom:3px;">W / L</div>
-              <div style="font-size:13px;font-weight:700;">
-                <span style="color:#0a7c42;">{wins}</span>
-                <span style="color:#ddd;font-size:10px;">/</span>
-                <span style="color:#c0392b;">{losses}</span>
-              </div>
-            </div>
-            <div style="padding:10px 8px;">
-              <div style="font-size:10px;color:#aaa;text-transform:uppercase;
-                          letter-spacing:.5px;margin-bottom:3px;">DD</div>
-              <div style="font-size:13px;font-weight:700;
-                          color:{'#c0392b' if total_warn else '#222'};">
-                {total_pct:.1f}<span style="font-size:10px;color:#bbb;">%</span>
-              </div>
-            </div>
-          </div>
-        </div>"""
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px;">Win / Loss</div>
+          </td>
+          <td style="width:25%;text-align:center;padding:0 0 0 6px;
+                     border-left:1px solid #e5e7eb;">
+            <div style="font-size:18px;font-weight:700;font-family:monospace;
+                        color:#111;">{days}<span style="font-size:12px;color:#9ca3af;">/4</span></div>
+            <div style="font-size:10px;color:#9ca3af;margin-top:2px;">Trading Days</div>
+          </td>
+        </tr>
+      </table>
+      <!-- progress bar -->
+      <div style="margin-bottom:6px;">
+        <div style="background:#e5e7eb;border-radius:99px;height:6px;">
+          <div style="background:#2563eb;border-radius:99px;height:6px;
+                      width:{bar_w}%;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+          <span style="font-size:10px;color:#9ca3af;">{prog:.0f}% to target</span>
+          <span style="font-size:10px;color:#9ca3af;">${remaining:,.0f} remaining</span>
+        </div>
+      </div>
+      <!-- risk indicators -->
+      <table style="border-collapse:collapse;width:100%;margin-top:8px;
+                    border-top:1px solid #e5e7eb;padding-top:8px;">
+        <tr>
+          <td style="padding-top:8px;font-size:11px;color:{'#dc2626' if d_warn else '#6b7280'};">
+            Daily risk used: <strong>{d_pct:.1f}%</strong>{"&nbsp;⚠" if d_warn else ""}
+          </td>
+          <td style="padding-top:8px;font-size:11px;color:{'#dc2626' if t_warn else '#6b7280'};
+                     text-align:right;">
+            Total drawdown: <strong>{t_pct:.1f}%</strong>{"&nbsp;⚠" if t_warn else ""}
+          </td>
+        </tr>
+      </table>
+    </div>"""
     except Exception:
         pass
 
-    # ── action button (only for GO signals) ───────────────────────────────────
-    action_html = ""
-    if is_action:
-        action_html = f"""
-        <div style="margin:0 20px 20px;text-align:center;">
-          <div style="display:inline-block;background:{acc};color:#fff;
-                      padding:12px 32px;border-radius:5px;font-size:14px;
-                      font-weight:700;letter-spacing:.5px;">
-            {meta['icon']}&nbsp; {meta['label']} — Open MT5 Now
-          </div>
-        </div>"""
+    # ── assemble full email ────────────────────────────────────────────────────
+    ts_parts = alert.get("timestamp", "").split(" ")
+    ts_display = " · ".join(ts_parts[:2]) if len(ts_parts) >= 2 else alert.get("timestamp", "")
 
-    # ── top accent line color ──────────────────────────────────────────────────
-    accent_line = f'<div style="height:4px;background:{acc};"></div>'
-
-    # ── full HTML ──────────────────────────────────────────────────────────────
-    return f"""<!DOCTYPE html>
+    html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
 </head>
-<body style="margin:0;padding:0;background:#f2f3f5;
+<body style="margin:0;padding:0;background:#f3f4f6;
              font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:20px 0;">
-  <tr><td align="center">
-  <table width="580" cellpadding="0" cellspacing="0"
-         style="background:#ffffff;border-radius:10px;overflow:hidden;
-                border:1px solid #e4e4e4;">
 
-    <!-- top accent line -->
-    <tr><td>{accent_line}</td></tr>
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#f3f4f6;padding:28px 0 36px;">
+  <tr><td align="center" style="padding:0 12px;">
 
-    <!-- header -->
-    <tr>
-      <td style="padding:18px 20px 14px;">
+    <table width="540" cellpadding="0" cellspacing="0"
+           style="background:#fff;border-radius:10px;overflow:hidden;
+                  max-width:540px;width:100%;">
+
+      <!-- top accent bar -->
+      <tr><td style="height:4px;background:{accent_color};font-size:0;">&nbsp;</td></tr>
+
+      <!-- header -->
+      <tr><td style="padding:20px 20px 16px;">
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td>
-              <span style="font-size:15px;font-weight:700;color:#1a1a1a;
-                           letter-spacing:.3px;">FTMO Agent</span>
-              <span style="font-size:12px;color:#bbb;margin-left:8px;">
+              <span style="font-size:15px;font-weight:700;color:#111;
+                           letter-spacing:-.2px;">FTMO Agent</span>
+              <span style="font-size:13px;color:#9ca3af;margin-left:8px;">
                 Market Monitor
               </span>
             </td>
-            <td align="right">
-              <span style="font-size:11px;color:#bbb;">{alert['timestamp']}</span>
+            <td style="text-align:right;">
+              <span style="font-size:12px;color:#9ca3af;font-family:monospace;">
+                {ts_display}
+              </span>
             </td>
           </tr>
         </table>
-      </td>
-    </tr>
+      </td></tr>
 
-    <!-- status hero -->
-    <tr>
-      <td style="padding:0 20px 16px;">
-        <div style="background:{acc_bg};border-left:4px solid {acc};
-                    border-radius:4px;padding:12px 16px;">
-          <div style="font-size:18px;font-weight:700;color:{acc};
-                      letter-spacing:.3px;">
-            {meta['icon']}&nbsp; {meta['label']}
+      <!-- status block -->
+      <tr><td style="padding:0 20px 20px;">
+        <div style="border-left:3px solid {accent_color};padding:10px 14px;
+                    background:#f9fafb;border-radius:0 6px 6px 0;">
+          <div style="font-size:17px;font-weight:700;color:#111;margin-bottom:3px;">
+            {STATUS_TITLE[dominant]}
           </div>
-          <div style="font-size:12px;color:#666;margin-top:4px;line-height:1.5;">
-            {alert.get('message','')}
+          <div style="font-size:13px;color:#6b7280;">
+            {STATUS_SUB[dominant]}
           </div>
         </div>
-      </td>
-    </tr>
+      </td></tr>
 
-    <!-- pair table -->
-    <tr>
-      <td style="padding:0 20px 8px;">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;
-                    color:#bbb;font-weight:700;margin-bottom:6px;">
-          Market Scan — 9 Pairs
-        </div>
+      <!-- trade setup card (GO signals only) -->
+      {trade_card}
+
+      <!-- pair table -->
+      <tr><td>
         <table width="100%" cellpadding="0" cellspacing="0"
-               style="border:1px solid #f0f0f0;border-radius:5px;overflow:hidden;">
+               style="border-collapse:collapse;border-top:1px solid #f3f4f6;">
           <thead>
-            <tr style="background:#f9f9f9;">
-              <th style="padding:7px 0 7px 12px;text-align:left;font-size:10px;
-                         color:#bbb;text-transform:uppercase;letter-spacing:.5px;
-                         font-weight:600;width:68px;border-bottom:1px solid #f0f0f0;">
-                Pair</th>
+            <tr style="background:#f9fafb;">
+              <th style="padding:7px 0 7px 20px;text-align:left;font-size:10px;
+                         color:#9ca3af;font-weight:600;letter-spacing:.5px;
+                         text-transform:uppercase;">Pair</th>
               <th style="padding:7px 8px;text-align:left;font-size:10px;
-                         color:#bbb;text-transform:uppercase;letter-spacing:.5px;
-                         font-weight:600;width:100px;border-bottom:1px solid #f0f0f0;">
-                Signal</th>
+                         color:#9ca3af;font-weight:600;letter-spacing:.5px;
+                         text-transform:uppercase;">Signal</th>
               <th style="padding:7px 8px;text-align:left;font-size:10px;
-                         color:#bbb;text-transform:uppercase;letter-spacing:.5px;
-                         font-weight:600;width:65px;border-bottom:1px solid #f0f0f0;">
-                Bias</th>
-              <th style="padding:7px 8px 7px 0;text-align:left;font-size:10px;
-                         color:#bbb;text-transform:uppercase;letter-spacing:.5px;
-                         font-weight:600;border-bottom:1px solid #f0f0f0;">
-                Note</th>
+                         color:#9ca3af;font-weight:600;letter-spacing:.5px;
+                         text-transform:uppercase;">Bias</th>
+              <th style="padding:7px 20px 7px 8px;text-align:left;font-size:10px;
+                         color:#9ca3af;font-weight:600;letter-spacing:.5px;
+                         text-transform:uppercase;">Note</th>
             </tr>
           </thead>
-          <tbody>
-            {pair_rows_html}
-          </tbody>
+          <tbody>{pair_rows}</tbody>
         </table>
-      </td>
-    </tr>
+      </td></tr>
 
-    <!-- action CTA -->
-    {action_html}
+      <!-- extras (news warnings, lessons) -->
+      {f'<tr><td style="padding:12px 0 0;">{extras}</td></tr>' if extras else ''}
 
-    <!-- lessons -->
-    {lessons_html}
+      <!-- challenge mini-dashboard -->
+      {f'<tr><td style="padding-bottom:20px;">{challenge_strip}</td></tr>' if challenge_strip else ''}
 
-    <!-- challenge tracker -->
-    {challenge_html}
-
-    <!-- footer -->
-    <tr>
-      <td style="padding:12px 20px;border-top:1px solid #f0f0f0;">
-        <p style="margin:0;font-size:11px;color:#ccc;line-height:1.6;">
-          Automated signal &mdash; confirm before execution.
-          &nbsp;Strategy: EMA Trend + H4 Pullback &nbsp;|&nbsp; Risk: 0.5% / trade
+      <!-- footer -->
+      <tr><td style="padding:14px 20px;border-top:1px solid #f3f4f6;">
+        <p style="margin:0;font-size:11px;color:#d1d5db;line-height:1.6;">
+          Automated signal · EMA Trend + H4 Pullback · 0.5% risk per trade<br>
+          Do not trade without your own confirmation.
         </p>
-      </td>
-    </tr>
+      </td></tr>
 
-  </table>
+    </table>
   </td></tr>
 </table>
+
 </body>
 </html>"""
+
+    return html
 
 
 # ── Main loop ──────────────────────────────────────────────────────────────────
