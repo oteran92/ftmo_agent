@@ -153,7 +153,7 @@ def send_email_alert(subject: str, body: str) -> bool:
         "message": {
             "subject": subject,
             "body": {
-                "contentType": "Text",
+                "contentType": "HTML",
                 "content": body,
             },
             "toRecipients": [{"emailAddress": {"address": to_email}}],
@@ -262,44 +262,273 @@ def run_check() -> dict:
 
 
 def _build_email_body(alert: dict) -> str:
-    """Format alert dict into a readable email body."""
-    lines = [
-        f"FTMO Agent — Market Alert",
-        f"Time: {alert['timestamp']}",
-        f"",
-        f"STATUS: {alert['message']}",
-        f"",
-        f"PAIR SIGNALS:",
-    ]
-    for s in alert["signals"]:
-        sig  = s.get("signal", "?")
-        pair = s.get("pair", "?")
+    """Format alert dict into a clean HTML email."""
+
+    # ── color palette ──────────────────────────────────────────────────────────
+    STATUS_COLORS = {
+        "GO_LONG":      ("#0d6b2e", "#e6f4ea"),   # dark-green text, light-green bg
+        "GO_SHORT":     ("#8b1a1a", "#fdecea"),   # dark-red text, light-red bg
+        "WATCH":        ("#7a5500", "#fff8e1"),   # amber
+        "NEWS_CAUTION": ("#6d3b00", "#fff3e0"),   # orange
+        "NEWS_BLOCK":   ("#5c0000", "#fce4ec"),   # deep red
+        "WAIT":         ("#555",    "#f5f5f5"),   # grey
+    }
+
+    # Dominant signal for the header banner
+    dominant = "WAIT"
+    for s in alert.get("signals", []):
+        sig = s.get("signal", "WAIT")
+        if sig in ("GO_LONG", "GO_SHORT"):
+            dominant = sig
+            break
+        if sig == "WATCH" and dominant == "WAIT":
+            dominant = "WATCH"
+        if sig in ("NEWS_CAUTION", "NEWS_BLOCK") and dominant == "WAIT":
+            dominant = sig
+
+    banner_fg, banner_bg = STATUS_COLORS.get(dominant, ("#333", "#f0f0f0"))
+
+    # ── banner label ───────────────────────────────────────────────────────────
+    BANNER_LABELS = {
+        "GO_LONG":      "ACTION REQUIRED — GO LONG",
+        "GO_SHORT":     "ACTION REQUIRED — GO SHORT",
+        "WATCH":        "WATCH — Approaching Setup Zone",
+        "NEWS_CAUTION": "NEWS CAUTION — Major Event Soon",
+        "NEWS_BLOCK":   "NEWS BLOCK — No Trading Now",
+        "WAIT":         "No Setup — Capital Protected",
+    }
+    banner_label = BANNER_LABELS.get(dominant, dominant)
+
+    # ── helpers ────────────────────────────────────────────────────────────────
+    def badge(sig: str) -> str:
+        fg, bg = STATUS_COLORS.get(sig, ("#555", "#eee"))
+        return (
+            f'<span style="background:{bg};color:{fg};padding:2px 8px;'
+            f'border-radius:4px;font-size:11px;font-weight:700;'
+            f'font-family:monospace;white-space:nowrap;">{sig}</span>'
+        )
+
+    def bias_arrow(bias: str) -> str:
+        if bias == "LONG":
+            return '<span style="color:#0d6b2e;font-weight:700;">&#9650; LONG</span>'
+        if bias == "SHORT":
+            return '<span style="color:#8b1a1a;font-weight:700;">&#9660; SHORT</span>'
+        return bias
+
+    # ── pair rows ──────────────────────────────────────────────────────────────
+    pair_rows_html = ""
+    for s in alert.get("signals", []):
+        sig  = s.get("signal", "WAIT")
+        pair = s.get("pair") or s.get("symbol") or "?"
         bias = s.get("bias", "")
         note = s.get("note", "") or s.get("next_step", "")
-        lines.append(f"  {pair}: {sig} ({bias}) — {note}")
-        if "trade" in s:
-            t = s["trade"]
-            lines.append(
-                f"    → Entry: {t['entry']} | SL: {t['sl']} | TP: {t['tp']} | "
-                f"SL: {t['sl_pips']}p | TP: {t['tp_pips']}p | RRR: {t['rrr']}"
-            )
-        if s.get("news"):
-            lines.append(f"    ⚠ {s['news']}")
+        trade = s.get("trade")
+        news_msg = s.get("news", "")
 
+        # Row background: highlight actionable pairs
+        row_bg = "#fff"
+        if sig in ("GO_LONG", "GO_SHORT"):
+            row_bg = STATUS_COLORS[sig][1]
+
+        pair_rows_html += f"""
+        <tr style="background:{row_bg};">
+          <td style="padding:10px 12px;font-weight:700;font-family:monospace;font-size:14px;">{pair}</td>
+          <td style="padding:10px 12px;">{badge(sig)}</td>
+          <td style="padding:10px 12px;">{bias_arrow(bias)}</td>
+          <td style="padding:10px 12px;color:#555;font-size:13px;">{note[:90]}</td>
+        </tr>"""
+
+        # Trade parameters sub-row
+        if trade:
+            t = trade
+            pair_rows_html += f"""
+        <tr style="background:{row_bg};">
+          <td colspan="4" style="padding:4px 12px 12px 24px;">
+            <table style="border-collapse:collapse;font-size:13px;font-family:monospace;">
+              <tr>
+                <td style="padding:4px 16px 4px 0;"><strong>Entry</strong><br>{t.get('entry')}</td>
+                <td style="padding:4px 16px 4px 0;color:#8b1a1a;"><strong>Stop Loss</strong><br>{t.get('sl')} &nbsp;({t.get('sl_pips')}p)</td>
+                <td style="padding:4px 16px 4px 0;color:#0d6b2e;"><strong>Take Profit</strong><br>{t.get('tp')} &nbsp;({t.get('tp_pips')}p)</td>
+                <td style="padding:4px 0;"><strong>RRR</strong><br>1 : {t.get('rrr')}</td>
+              </tr>
+            </table>
+          </td>
+        </tr>"""
+
+        if news_msg:
+            pair_rows_html += f"""
+        <tr style="background:#fff8e1;">
+          <td colspan="4" style="padding:4px 12px 10px 24px;font-size:12px;color:#7a5500;">
+            ⚠&nbsp; {news_msg}
+          </td>
+        </tr>"""
+
+    # ── lessons block ──────────────────────────────────────────────────────────
+    lessons_html = ""
     if alert.get("new_lessons"):
-        lines += ["", "NEW TRADE LESSONS:"]
-        for l in alert["new_lessons"]:
-            lines.append(f"  [{l.get('pair')} {l.get('outcome')}] {l.get('lesson')}")
+        lessons_html = """
+        <tr><td colspan="4" style="padding:16px 12px 4px;font-size:13px;font-weight:700;
+                color:#333;border-top:1px solid #eee;">NEW TRADE LESSONS</td></tr>"""
+        for lesson in alert["new_lessons"]:
+            outcome = lesson.get("outcome", "")
+            outcome_color = "#0d6b2e" if outcome == "WIN" else "#8b1a1a"
+            lessons_html += f"""
+        <tr><td colspan="4" style="padding:4px 12px 4px 24px;font-size:13px;color:#444;">
+          <span style="color:{outcome_color};font-weight:700;">[{lesson.get('pair')} {outcome}]</span>
+          &nbsp;{lesson.get('lesson','')[:120]}
+        </td></tr>"""
 
-    # Challenge progress dashboard — appended to every email
+    # ── challenge tracker ──────────────────────────────────────────────────────
+    challenge_html = ""
     try:
-        from skills.challenge_tracker import format_email_block
-        lines.append(format_email_block())
+        from skills.challenge_tracker import get_dashboard
+        d = get_dashboard()
+        profit_pct   = d.get("profit_pct", 0)
+        progress_pct = d.get("progress_pct", 0)
+        balance      = d.get("current_balance", 0)
+        target       = d.get("challenge_target", 110000)
+        remaining    = d.get("remaining_usd", 0)
+        daily_used   = d.get("daily_loss_pct_used", 0)
+        total_used   = d.get("total_loss_pct_used", 0)
+        days_done    = d.get("trading_days_done", 0)
+        wins         = d.get("trades_won", 0)
+        losses       = d.get("trades_lost", 0)
+        phase        = d.get("phase", "")
+        bar_width    = min(int(progress_pct), 100)
+        profit_color = "#0d6b2e" if profit_pct >= 0 else "#8b1a1a"
+
+        challenge_html = f"""
+        <tr><td colspan="4" style="padding:0;"></td></tr>
+        <tr>
+          <td colspan="4" style="padding:16px 12px 0;border-top:2px solid #e0e0e0;">
+            <div style="background:#f8f9fa;border-radius:6px;padding:14px 18px;">
+              <div style="font-size:12px;color:#888;text-transform:uppercase;
+                          letter-spacing:1px;margin-bottom:8px;">
+                FTMO Challenge — {phase}
+              </div>
+              <table style="width:100%;border-collapse:collapse;font-size:13px;">
+                <tr>
+                  <td style="padding:3px 0;color:#555;">Balance</td>
+                  <td style="padding:3px 0;font-weight:700;font-family:monospace;">
+                    ${balance:,.2f}
+                    <span style="color:{profit_color};margin-left:8px;">
+                      ({profit_pct:+.2f}%)
+                    </span>
+                  </td>
+                  <td style="padding:3px 0 3px 24px;color:#555;">Trading Days</td>
+                  <td style="padding:3px 0;font-weight:700;">{days_done} / 4 min</td>
+                </tr>
+                <tr>
+                  <td style="padding:3px 0;color:#555;">Target</td>
+                  <td style="padding:3px 0;font-family:monospace;">
+                    ${target:,.0f} &nbsp;(needs ${remaining:,.0f} more)
+                  </td>
+                  <td style="padding:3px 0 3px 24px;color:#555;">Win / Loss</td>
+                  <td style="padding:3px 0;font-weight:700;">
+                    <span style="color:#0d6b2e;">{wins}W</span> /
+                    <span style="color:#8b1a1a;">{losses}L</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:3px 0;color:#555;">Daily risk used</td>
+                  <td style="padding:3px 0;color:{'#8b1a1a' if daily_used>80 else '#555'};">
+                    {daily_used:.1f}%
+                  </td>
+                  <td style="padding:3px 0 3px 24px;color:#555;">Total drawdown</td>
+                  <td style="padding:3px 0;color:{'#8b1a1a' if total_used>70 else '#555'};">
+                    {total_used:.1f}%
+                  </td>
+                </tr>
+              </table>
+              <!-- progress bar -->
+              <div style="margin-top:10px;">
+                <div style="font-size:11px;color:#888;margin-bottom:4px;">
+                  Progress to target: {progress_pct:.1f}%
+                </div>
+                <div style="background:#e0e0e0;border-radius:4px;height:8px;width:100%;">
+                  <div style="background:#1a73e8;border-radius:4px;height:8px;
+                              width:{bar_width}%;"></div>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>"""
     except Exception:
         pass
 
-    lines += ["", "— FTMO Agent"]
-    return "\n".join(lines)
+    # ── full HTML ──────────────────────────────────────────────────────────────
+    html = f"""<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"></head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0"
+       style="background:#f0f2f5;padding:24px 0;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0"
+           style="background:#fff;border-radius:8px;overflow:hidden;
+                  box-shadow:0 2px 8px rgba(0,0,0,.10);">
+
+      <!-- Header -->
+      <tr style="background:#1a1a2e;">
+        <td style="padding:20px 24px;">
+          <span style="color:#fff;font-size:18px;font-weight:700;
+                       letter-spacing:1px;">FTMO Agent</span>
+          <span style="color:#aaa;font-size:13px;margin-left:12px;">Market Monitor</span>
+          <div style="color:#aaa;font-size:12px;margin-top:4px;">{alert['timestamp']}</div>
+        </td>
+      </tr>
+
+      <!-- Status banner -->
+      <tr style="background:{banner_bg};">
+        <td style="padding:14px 24px;">
+          <span style="color:{banner_fg};font-size:16px;font-weight:700;">
+            {banner_label}
+          </span>
+          <div style="color:{banner_fg};font-size:13px;margin-top:4px;opacity:.8;">
+            {alert.get('message','')}
+          </div>
+        </td>
+      </tr>
+
+      <!-- Pair table -->
+      <tr><td style="padding:0 12px;">
+        <table width="100%" cellpadding="0" cellspacing="0"
+               style="border-collapse:collapse;margin:16px 0;">
+          <thead>
+            <tr style="background:#f5f5f5;border-bottom:2px solid #e0e0e0;">
+              <th style="padding:8px 12px;text-align:left;font-size:12px;
+                         color:#888;text-transform:uppercase;letter-spacing:.5px;">Pair</th>
+              <th style="padding:8px 12px;text-align:left;font-size:12px;
+                         color:#888;text-transform:uppercase;letter-spacing:.5px;">Signal</th>
+              <th style="padding:8px 12px;text-align:left;font-size:12px;
+                         color:#888;text-transform:uppercase;letter-spacing:.5px;">Bias</th>
+              <th style="padding:8px 12px;text-align:left;font-size:12px;
+                         color:#888;text-transform:uppercase;letter-spacing:.5px;">Note</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pair_rows_html}
+            {lessons_html}
+            {challenge_html}
+          </tbody>
+        </table>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr style="background:#f8f9fa;border-top:1px solid #e0e0e0;">
+        <td style="padding:14px 24px;font-size:12px;color:#aaa;">
+          Automated signal — do not trade without your own confirmation.<br>
+          Strategy: EMA Trend + H4 Pullback &nbsp;|&nbsp; Risk: 0.5% per trade
+        </td>
+      </tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>"""
+
+    return html
 
 
 # ── Main loop ──────────────────────────────────────────────────────────────────
