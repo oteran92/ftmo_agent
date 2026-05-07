@@ -5,8 +5,12 @@ Uses Forex Factory's public calendar endpoint; falls back gracefully if unavaila
 
 Two protection levels:
   BLOCK   — high-impact event within ±NEWS_BUFFER_MIN (30 min). Do NOT trade.
-  CAUTION — high-impact event within the next 24 hours. Setup valid but entry is risky.
+  CAUTION — high-impact event within the next 4 hours. Setup valid but entry is risky.
   CLEAR   — no relevant high-impact events. Trading allowed.
+
+Note: CAUTION window was reduced from 24h to 4h (2026-05-07).
+A 24h window was blocking too many valid setups given the frequency of macro events.
+The hard BLOCK (±30 min) remains unchanged — that is the real protection.
 """
 
 from __future__ import annotations
@@ -33,8 +37,9 @@ _CURRENCY_TO_PAIRS: dict[str, list[str]] = {
     "CHF": ["USD/CHF"],
 }
 
-# Hours before a major event to downgrade GO signals to CAUTION
-_CAUTION_HOURS = 24
+# Hours before a major event to downgrade GO signals to CAUTION.
+# 4h is enough to warn the trader; 24h was blocking too many valid setups.
+_CAUTION_HOURS = 4
 
 
 def _get_affected_currencies(pair: str) -> list[str]:
@@ -109,7 +114,7 @@ def check_news_block(pair: str) -> dict[str, Any]:
     pair_events = [e for e in all_events if e["currency"] in affected]
 
     if not pair_events:
-        return {"status": "CLEAR", "message": "No high-impact news in next 24h.", "events": []}
+        return {"status": "CLEAR", "message": f"No high-impact news in next {_CAUTION_HOURS}h.", "events": []}
 
     # BLOCK: event within the ±30 min buffer
     blocking = [e for e in pair_events if abs(e["minutes_away"]) <= NEWS_BUFFER_MIN]
