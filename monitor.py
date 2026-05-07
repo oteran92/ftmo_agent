@@ -601,7 +601,7 @@ def main() -> None:
 
                 print(f"[Monitor] {alert['message']}", flush=True)
 
-                # Send email for actionable signals, CAUTION alerts, and WATCH alerts
+                # Determine email priority and subject prefix
                 if alert["action_required"]:
                     subject = f"FTMO SETUP: {alert['message'][:60]}"
                     send_email_alert(subject, _build_email_body(alert))
@@ -610,6 +610,11 @@ def main() -> None:
                     send_email_alert(subject, _build_email_body(alert))
                 elif any(s.get("signal") == "WATCH" for s in alert["signals"]):
                     subject = f"FTMO WATCH: {alert['message'][:60]}"
+                    send_email_alert(subject, _build_email_body(alert))
+                elif now.hour == 7:
+                    # Daily morning digest at 07:03 CEST — always sent so the user
+                    # knows the system is alive even when there are no setups.
+                    subject = f"FTMO Morning Digest — {now.strftime('%a %d %b')}"
                     send_email_alert(subject, _build_email_body(alert))
 
         except KeyboardInterrupt:
