@@ -390,3 +390,63 @@ def scan_all_pairs_cached() -> list[dict]:
     API calls between H4 cycles — only fetches fresh data when cache expires.
     """
     return scan_all_pairs()
+
+
+# Lesson learned 2026-05-08 (USDCAD SHORT loss):
+# Entry slippage reduced SL buffer from 14.6p to 9.4p, increasing stop-out probability.
+_MAX_ENTRY_SLIPPAGE_PIPS = 3.0
+
+
+def validate_entry(signal_result: dict, live_price: float) -> dict:
+    """
+    Pre-trade execution check. Call this before placing any order.
+
+    Validates that:
+      1. The live price is within MAX_SLIPPAGE_PIPS of the signal entry.
+      2. If slippage is acceptable, recalculates SL from live price (not signal price)
+         so the SL distance stays consistent and the trade has the expected breathing room.
+
+    Returns a dict with:
+      - "ok": bool — True if safe to enter
+      - "warning": str — explanation if not ok
+      - "adjusted_sl": float — SL recalculated from live price (use this, not the signal SL)
+      - "adjusted_tp": float — TP recalculated from live price at same RRR
+      - "slippage_pips": float — actual slippage vs signal entry
+    """
+    trade = signal_result.get("trade", {})
+    if not trade:
+        return {"ok": False, "warning": "No trade parameters in signal."}
+
+    signal_entry = trade.get("entry", live_price)
+    sl_pips      = trade.get("sl_pips", 0)
+    tp_pips      = trade.get("tp_pips", 0)
+    signal       = signal_result.get("signal", "")
+    sym          = signal_result.get("pair") or signal_result.get("symbol", "")
+    pip          = _PIP_SIZE.get(sym, 0.0001)
+
+    direction    = 1 if signal == "GO_SHORT" else -1   # +1 = SHORT moves SL above, TP below
+    slippage     = abs(live_price - signal_entry) / pip
+
+    if slippage > _MAX_ENTRY_SLIPPAGE_PIPS:
+        return {
+            "ok":      False,
+            "warning": (
+                f"Slippage {slippage:.1f}p exceeds {_MAX_ENTRY_SLIPPAGE_PIPS}p limit. "
+                f"Signal entry: {signal_entry}, live: {live_price}. "
+                f"Do not enter — wait for a cleaner entry or next signal."
+            ),
+            "slippage_pips": round(slippage, 1),
+        }
+
+    # Recalculate SL/TP from live price to maintain original pip distances
+    adjusted_sl = round(live_price + direction * sl_pips * pip, 5)
+    adjusted_tp = round(live_price - direction * tp_pips * pip, 5)
+
+    return {
+        "ok":           True,
+        "slippage_pips": round(slippage, 1),
+        "adjusted_entry": live_price,
+        "adjusted_sl":    adjusted_sl,
+        "adjusted_tp":    adjusted_tp,
+        "warning":        f"Slippage {slippage:.1f}p — within limit. Use adjusted SL/TP from live price.",
+    }
