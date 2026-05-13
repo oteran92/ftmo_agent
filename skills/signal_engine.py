@@ -202,16 +202,160 @@ def _is_pin_bar(candle: dict, direction: str) -> bool:
         return body_ratio < 0.35 and upper_wick > total_range * 0.55
 
 
+# ── Pure technical signal computation (no I/O, no API calls) ──────────────────
+def _compute_signal(
+    d1_candles: list[dict],
+    h4_candles: list[dict],
+    sym: str,
+    rrr_override: float | None = None,
+    sl_buffer_pips: int = 5,
+) -> dict[str, Any]:
+    """
+    Pure function: derive a trading signal from already-loaded OHLC candles.
+
+    Usable both in live mode (called by analyze_setup after fetching from API)
+    and in backtest mode (called by backtest/engine.py with historical slices).
+
+    Parameters
+    ----------
+    d1_candles      : D1 candles list [{t, o, h, l, c}], oldest first, min 55 needed
+    h4_candles      : H4 candles list, oldest first, min 25 needed
+    sym             : uppercase symbol e.g. "EURUSD"
+    rrr_override    : override the default 2.0 RRR (used by ablation variants)
+    sl_buffer_pips  : pips added to H4 high/low for SL (default 5, ablation may use 3)
+
+    Returns a dict with keys: symbol, signal, bias, analysis, trade (if actionable).
+    Never makes network calls or reads files — all data is passed in.
+    """
+    pip_size = _PIP_SIZE.get(sym, 0.0001)
+    rrr      = rrr_override if rrr_override is not None else 2.0
+
+    if len(d1_candles) < 55 or len(h4_candles) < 25:
+        return {
+            "signal": "INSUFFICIENT_DATA",
+            "symbol": sym,
+            "d1_candles": len(d1_candles),
+            "h4_candles": len(h4_candles),
+            "error": "Need at least 55 D1 candles and 25 H4 candles.",
+        }
+
+    # Step 1: D1 trend via EMA50
+    d1_closes     = [c["c"] for c in d1_candles]
+    d1_ema50      = _ema(d1_closes, 50)
+    d1_ema50_val  = d1_ema50[-1]
+    d1_ema50_prev = d1_ema50[-2]
+    current_price = d1_candles[-1]["c"]
+
+    trend_up      = current_price > d1_ema50_val
+    ema_rising    = d1_ema50_val > d1_ema50_prev
+    bias          = "LONG" if trend_up else "SHORT"
+    distance_pips = abs(current_price - d1_ema50_val) / pip_size
+
+    # Step 2: H4 EMA20 pullback zone
+    h4_closes    = [c["c"] for c in h4_candles]
+    h4_ema20     = _ema(h4_closes, 20)
+    h4_ema20_val = h4_ema20[-1]
+    h4_last      = h4_candles[-1]
+    h4_prev      = h4_candles[-2]
+
+    effective_price = h4_last["c"]
+    in_ema_zone     = (h4_last["l"] <= h4_ema20_val <= h4_last["h"]) or \
+                      (abs(effective_price - h4_ema20_val) / pip_size < 15)
+    near_ema        = abs(effective_price - h4_ema20_val) / pip_size < 15
+
+    # Step 3: Confirmation candle
+    bull_engulf = _is_bullish_engulfing(h4_prev, h4_last)
+    bear_engulf = _is_bearish_engulfing(h4_prev, h4_last)
+    bull_pin    = _is_pin_bar(h4_last, "bull")
+    bear_pin    = _is_pin_bar(h4_last, "bear")
+
+    confirmation_long  = bull_engulf or bull_pin
+    confirmation_short = bear_engulf or bear_pin
+
+    # Step 4: Signal + levels
+    sig     = "WAIT"
+    pattern = "none"
+    entry = sl = tp = computed_rrr = 0.0
+
+    if bias == "LONG" and (in_ema_zone or near_ema) and confirmation_long:
+        sig     = "GO_LONG"
+        pattern = "bullish engulfing" if bull_engulf else "bull pin bar"
+        entry   = h4_last["c"]
+        sl      = h4_last["l"] - (pip_size * sl_buffer_pips)
+        sl_dist = entry - sl
+        tp      = entry + (sl_dist * rrr)
+        computed_rrr = (tp - entry) / sl_dist
+
+    elif bias == "SHORT" and (in_ema_zone or near_ema) and confirmation_short:
+        sig     = "GO_SHORT"
+        pattern = "bearish engulfing" if bear_engulf else "bear pin bar"
+        entry   = h4_last["c"]
+        sl      = h4_last["h"] + (pip_size * sl_buffer_pips)
+        sl_dist = sl - entry
+        tp      = entry - (sl_dist * rrr)
+        computed_rrr = (entry - tp) / sl_dist
+
+    elif (in_ema_zone or near_ema) and bias == "LONG" and not confirmation_long:
+        sig = "WATCH"
+    elif (in_ema_zone or near_ema) and bias == "SHORT" and not confirmation_short:
+        sig = "WATCH"
+
+    result: dict[str, Any] = {
+        "symbol": sym,
+        "signal": sig,
+        "bias":   bias,
+        "analysis": {
+            "d1_trend":                 f"Price {'above' if trend_up else 'below'} EMA50 — {'uptrend' if trend_up else 'downtrend'}",
+            "d1_ema50":                 round(d1_ema50_val, 5),
+            "d1_ema_direction":         "rising" if ema_rising else "falling",
+            "distance_from_ema50_pips": round(distance_pips, 1),
+            "h4_ema20":                 round(h4_ema20_val, 5),
+            "live_price":               round(effective_price, 5),
+            "h4_last_close":            round(h4_last["c"], 5),
+            "in_ema20_zone":            in_ema_zone or near_ema,
+            "confirmation":             pattern,
+        },
+    }
+
+    if sig in ("GO_LONG", "GO_SHORT"):
+        result["trade"] = {
+            "entry":   round(entry, 5),
+            "sl":      round(sl, 5),
+            "tp":      round(tp, 5),
+            "rrr":     round(computed_rrr, 2),
+            "sl_pips": round(abs(entry - sl) / pip_size, 1),
+            "tp_pips": round(abs(tp - entry) / pip_size, 1),
+        }
+        result["next_step"] = (
+            f"SETUP CONFIRMED — {sig} on {sym}. "
+            f"Entry {round(entry,5)} | SL {round(sl,5)} | TP {round(tp,5)} | RRR {round(computed_rrr,2)}"
+        )
+    elif sig == "WATCH":
+        result["next_step"] = (
+            f"Price at H4 EMA20 zone ({round(h4_ema20_val,5)}) but no confirmation candle yet. "
+            f"Check again after next H4 close."
+        )
+    else:
+        result["next_step"] = (
+            f"No setup. Price not near H4 EMA20 ({round(h4_ema20_val,5)}). "
+            f"Live: {round(effective_price,5)}. Wait for pullback."
+        )
+
+    return result
+
+
 # ── Core analysis ──────────────────────────────────────────────────────────────
 def analyze_setup(symbol: str = "EURUSD") -> dict[str, Any]:
     """
     Full setup analysis for a symbol using D1 trend and H4 entry.
     Data is fetched from TwelveData — no MT5 or local files required.
+
+    Internally calls _compute_signal (pure fn) and then layers on
+    4-pillar conviction analysis + news filter.
     """
     sym      = symbol.replace("/", "").upper()
-    pip_size = _PIP_SIZE.get(sym, 0.0001)
 
-    # ── Fetch data (D1 + H4 = 2 API credits per pair, within free plan budget) ──
+    # Fetch data (D1 + H4 = 2 API credits per pair, within free plan budget)
     d1_candles = _fetch_candles(sym, "1day", count=100)
     time.sleep(_INTRA_PAIR_DELAY)  # gap between D1 and H4 to avoid rate limit bursts
     h4_candles = _fetch_candles(sym, "4h",   count=100)
@@ -228,125 +372,11 @@ def analyze_setup(symbol: str = "EURUSD") -> dict[str, Any]:
             "symbol": sym,
             "error": f"TwelveData returned no H4 data for {sym}.",
         }
-    if len(d1_candles) < 55 or len(h4_candles) < 25:
-        return {
-            "signal": "INSUFFICIENT_DATA",
-            "symbol": sym,
-            "d1_candles": len(d1_candles),
-            "h4_candles": len(h4_candles),
-            "error": "Need at least 55 D1 candles and 25 H4 candles.",
-        }
 
-    # ── Step 1: D1 trend via EMA50 ─────────────────────────────────────────────
-    d1_closes     = [c["c"] for c in d1_candles]
-    d1_ema50      = _ema(d1_closes, 50)
-    d1_ema50_val  = d1_ema50[-1]
-    d1_ema50_prev = d1_ema50[-2]
+    result = _compute_signal(d1_candles, h4_candles, sym)
+    signal = result["signal"]
 
-    # Use last H4 close as effective price (avoids extra API credit; fine for swing trading)
-    live_price    = None  # skip separate price call to stay within 8 req/min free limit
-    current_price = d1_candles[-1]["c"]
-
-    trend_up      = current_price > d1_ema50_val
-    ema_rising    = d1_ema50_val > d1_ema50_prev
-    bias          = "LONG" if trend_up else "SHORT"
-    distance_pips = abs(current_price - d1_ema50_val) / pip_size
-
-    # ── Step 2: H4 EMA20 pullback zone ────────────────────────────────────────
-    h4_closes    = [c["c"] for c in h4_candles]
-    h4_ema20     = _ema(h4_closes, 20)
-    h4_ema20_val = h4_ema20[-1]
-    h4_last      = h4_candles[-1]
-    h4_prev      = h4_candles[-2]
-
-    effective_price = h4_last["c"]  # last closed H4 candle — accurate for swing entry
-    in_ema_zone     = (h4_last["l"] <= h4_ema20_val <= h4_last["h"]) or \
-                      (abs(effective_price - h4_ema20_val) / pip_size < 15)
-    near_ema        = abs(effective_price - h4_ema20_val) / pip_size < 15
-
-    # ── Step 3: Confirmation candle ────────────────────────────────────────────
-    bull_engulf = _is_bullish_engulfing(h4_prev, h4_last)
-    bear_engulf = _is_bearish_engulfing(h4_prev, h4_last)
-    bull_pin    = _is_pin_bar(h4_last, "bull")
-    bear_pin    = _is_pin_bar(h4_last, "bear")
-
-    confirmation_long  = bull_engulf or bull_pin
-    confirmation_short = bear_engulf or bear_pin
-
-    # ── Step 4: Signal ─────────────────────────────────────────────────────────
-    signal = "WAIT"
-    pattern = "none"
-    entry = sl = tp = rrr = 0.0
-
-    if bias == "LONG" and (in_ema_zone or near_ema) and confirmation_long:
-        signal  = "GO_LONG"
-        pattern = "bullish engulfing" if bull_engulf else "bull pin bar"
-        entry   = h4_last["c"]
-        sl      = h4_last["l"] - (pip_size * 5)
-        sl_dist = entry - sl
-        tp      = entry + (sl_dist * 2.0)
-        rrr     = (tp - entry) / sl_dist
-
-    elif bias == "SHORT" and (in_ema_zone or near_ema) and confirmation_short:
-        signal  = "GO_SHORT"
-        pattern = "bearish engulfing" if bear_engulf else "bear pin bar"
-        entry   = h4_last["c"]
-        sl      = h4_last["h"] + (pip_size * 5)
-        sl_dist = sl - entry
-        tp      = entry - (sl_dist * 2.0)
-        rrr     = (entry - tp) / sl_dist
-
-    elif (in_ema_zone or near_ema) and bias == "LONG" and not confirmation_long:
-        signal = "WATCH"
-    elif (in_ema_zone or near_ema) and bias == "SHORT" and not confirmation_short:
-        signal = "WATCH"
-
-    # ── Build result ───────────────────────────────────────────────────────────
-    result: dict[str, Any] = {
-        "symbol": sym,
-        "signal": signal,
-        "bias":   bias,
-        "analysis": {
-            "d1_trend":                 f"Price {'above' if trend_up else 'below'} EMA50 — {'uptrend' if trend_up else 'downtrend'}",
-            "d1_ema50":                 round(d1_ema50_val, 5),
-            "d1_ema_direction":         "rising" if ema_rising else "falling",
-            "distance_from_ema50_pips": round(distance_pips, 1),
-            "h4_ema20":                 round(h4_ema20_val, 5),
-            "live_price":               round(effective_price, 5),
-            "h4_last_close":            round(h4_last["c"], 5),
-            "in_ema20_zone":            in_ema_zone or near_ema,
-            "confirmation":             pattern,
-        },
-    }
-
-    if signal in ("GO_LONG", "GO_SHORT"):
-        result["trade"] = {
-            "entry":   round(entry, 5),
-            "sl":      round(sl, 5),
-            "tp":      round(tp, 5),
-            "rrr":     round(rrr, 2),
-            "sl_pips": round(abs(entry - sl) / pip_size, 1),
-            "tp_pips": round(abs(tp - entry) / pip_size, 1),
-        }
-        result["next_step"] = (
-            f"SETUP CONFIRMED — {signal} on {sym}. "
-            f"Entry {round(entry,5)} | SL {round(sl,5)} | TP {round(tp,5)} | RRR {round(rrr,2)}"
-        )
-    elif signal == "WATCH":
-        result["next_step"] = (
-            f"Price at H4 EMA20 zone ({round(h4_ema20_val,5)}) but no confirmation candle yet. "
-            f"Check again after next H4 close."
-        )
-    else:
-        result["next_step"] = (
-            f"No setup. Price not near H4 EMA20 ({round(h4_ema20_val,5)}). "
-            f"Live: {round(effective_price,5)}. Wait for pullback."
-        )
-
-    # ── 4-Pillar conviction analysis (FTMO Academy methodology) ──────────────────
-    # Runs for every GO signal to assign HIGH / MEDIUM / LOW conviction.
-    # LOW conviction automatically downgrades GO → WATCH to avoid low-quality entries.
-    # Runs BEFORE news filter so the conviction snapshot is always attached.
+    # 4-Pillar conviction analysis — runs for every GO signal
     if signal in ("GO_LONG", "GO_SHORT"):
         try:
             from skills.market_analyst import run_full_analysis
@@ -355,37 +385,33 @@ def analyze_setup(symbol: str = "EURUSD") -> dict[str, Any]:
             result["analyst"]    = analyst
 
             if analyst["conviction"] == "LOW":
-                # Insufficient multi-pillar alignment — protect capital by waiting
                 result["signal"]    = "WATCH"
                 result["next_step"] = (
                     f"Signal downgraded WATCH — Low conviction ({analyst['score']:+d}/6). "
                     f"{analyst['summary']}"
                 )
+                signal = "WATCH"
         except Exception:
-            # Market analyst is non-critical — never block a valid signal over an analysis error
             result.setdefault("conviction", "UNKNOWN")
 
-    # ── News filter: check calendar AFTER building the technical signal ─────────
-    # Runs last so technical analysis is always complete regardless of news.
+    # News filter — runs last so technical analysis is always complete
     try:
         from skills.news_filter import check_news_block
         news = check_news_block(sym)
         result["news"] = news
 
         if news["status"] == "BLOCK" and signal in ("GO_LONG", "GO_SHORT", "WATCH"):
-            # Override: hard block — active news window
             result["signal"]    = "NEWS_BLOCK"
             result["next_step"] = f"Entry blocked — {news['message']}"
 
         elif news["status"] == "CAUTION" and signal in ("GO_LONG", "GO_SHORT"):
-            # Downgrade GO → NEWS_CAUTION — setup is valid but entry is risky before major news
             result["signal"]    = "NEWS_CAUTION"
             result["next_step"] = (
                 f"Setup valid ({signal}) but entry NOT recommended — {news['message']}. "
                 f"Wait until after the event, then re-evaluate."
             )
     except Exception:
-        pass  # news filter is non-critical — never block a result over a calendar fetch error
+        pass  # news filter is non-critical
 
     return result
 
