@@ -456,6 +456,24 @@ def _build_email_body(alert: dict) -> str:
                     f"@ {cmd.get('price')} | SL {cmd.get('sl')} | TP {cmd.get('tp')} "
                     f"| Risk ${exec_result.get('risk_usd')}"
                 )
+                # Surface pre-mortem approval as one-liner
+                pm_line = ""
+                for w in exec_result.get("warnings", []):
+                    if w.startswith("Pre-mortem GO:"):
+                        pm_line = w
+                        break
+                if pm_line:
+                    exec_msg += f"<br><em style='font-size:11px;color:#555;'>🧠 {pm_line}</em>"
+            elif exec_result.get("premortem"):
+                # Pre-mortem VETO — special red callout
+                pm = exec_result["premortem"]
+                exec_bg, exec_color = "#fce4ec", "#b71c1c"
+                risks_html = "".join(f"<li>{r}</li>" for r in pm.get("risks", []))
+                exec_msg = (
+                    f"🚫 <strong>CLAUDE VETOED THIS TRADE</strong><br>"
+                    f"Reason: {pm.get('reason', '?')}<br>"
+                    f"<ul style='margin:4px 0 0 16px;padding:0;'>{risks_html}</ul>"
+                )
             else:
                 exec_bg, exec_color = "#fff8e1", "#7a5500"
                 exec_msg = f"⚠ Manual entry required — {exec_result.get('reason','?')}"

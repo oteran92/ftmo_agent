@@ -330,6 +330,32 @@ def execute_trade(signal: dict, dry_run: bool = False) -> dict[str, Any]:
     else:
         warnings.append("Live price unavailable — skipping slippage/spread check.")
 
+    # Guard 8 — Pre-mortem: Claude evaluates risk before execution (skip on dry_run)
+    if not dry_run:
+        try:
+            from skills.premortem import evaluate_setup, log_verdict
+            from skills.metaapi_client import get_closed_trades
+
+            recent_trades = []
+            try:
+                recent_trades = get_closed_trades(days=30) or []
+            except Exception:
+                pass
+
+            pm_result = evaluate_setup(signal, state, recent_trades)
+            log_verdict(pair, sig_type, pm_result, signal)
+
+            if pm_result["verdict"] == "VETO":
+                return {
+                    "executed": False,
+                    "reason": f"Pre-mortem veto: {pm_result['reason']}",
+                    "premortem": pm_result,
+                    "command": None,
+                }
+            warnings.append(f"Pre-mortem GO: {pm_result['reason']}")
+        except Exception as exc:
+            warnings.append(f"Pre-mortem skipped (error): {exc}")
+
     sl_pips  = float(trade.get("sl_pips", 15))
     lot_size = _lots(balance, sl_pips, pair)
     risk_usd = round(balance * _RISK_FRACTION, 2)
