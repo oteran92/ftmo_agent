@@ -5,7 +5,15 @@ Validates a proposed trade against the full FTMO methodology checklist.
 
 from __future__ import annotations
 
-from config import MIN_RRR, HARD_STOP_LOSSES
+from datetime import datetime, timezone
+
+from config import (
+    MIN_RRR,
+    HARD_STOP_LOSSES,
+    TRADING_SESSIONS_UTC,
+    CAUTION_DAYS,
+    CORRELATED_PAIRS,
+)
 from state import load_state, is_trading_halted
 from skills.lot_calculator import calculate_lot_size
 from skills.news_filter import check_news_window
@@ -109,6 +117,65 @@ def review_trade(
             "CRISIS MODE active — lot size is 50% of normal. "
             "Only trade highest-conviction setups."
         )
+
+    # ── 9. Session filter ─────────────────────────────────────────────────────
+    # Academy: London (08–16 UTC) and NY (12–21 UTC) have highest volume.
+    # Asian session has LOWEST volume — patterns fail more often (FTMO Academy).
+    now_utc = datetime.now(timezone.utc)
+    hour    = now_utc.hour
+    in_valid_session = any(start <= hour < end for start, end in TRADING_SESSIONS_UTC)
+    checks["session_ok"] = in_valid_session
+    if not in_valid_session:
+        warnings.append(
+            f"Hour {hour:02d}:00 UTC is outside London (08–16) and NY (12–21) sessions. "
+            "Asian session has the lowest volume — setups fail more often. "
+            "Wait for London open or trade later."
+        )
+
+    # ── 10. Day-of-week filter ────────────────────────────────────────────────
+    # Academy: Tue/Wed/Thu are best days. Monday AM and Friday PM are low-quality.
+    weekday = now_utc.weekday()  # 0=Mon … 6=Sun
+    mon_day, mon_hour = CAUTION_DAYS["monday_morning"]
+    fri_day, fri_hour = CAUTION_DAYS["friday_afternoon"]
+
+    if weekday == mon_day and hour < mon_hour:
+        warnings.append(
+            f"Monday morning ({hour:02d}:00 UTC) — market slow until NY session opens at 12:00 UTC. "
+            "Volume is minimal; best setups appear Tue–Thu."
+        )
+    elif weekday == fri_day and hour >= fri_hour:
+        warnings.append(
+            f"Friday after {fri_hour:02d}:00 UTC — London closed, volume drying up. "
+            "Weekend gap risk if holding a position into the close."
+        )
+
+    # ── 11. Correlation guard ─────────────────────────────────────────────────
+    # Academy: EURUSD + GBPUSD open simultaneously = double USD exposure.
+    # Opening correlated pairs multiplies risk beyond the 0.5% per-trade rule.
+    pair_clean = pair_upper.replace("/", "").replace("-", "").replace("_", "")
+    correlated = CORRELATED_PAIRS.get(pair_clean, [])
+
+    if correlated:
+        try:
+            from mt5_connector import get_positions
+            open_positions = get_positions() or []
+            open_symbols = {
+                p.get("symbol", "").replace("/", "").replace("-", "").replace("_", "").upper()
+                for p in open_positions
+            }
+            conflicts = [c for c in correlated if c in open_symbols]
+            checks["correlation_ok"] = len(conflicts) == 0
+            if conflicts:
+                warnings.append(
+                    f"Correlation risk: already holding {', '.join(conflicts)}. "
+                    f"Adding {pair_clean} doubles USD directional exposure — "
+                    "consider sizing down or skipping this trade."
+                )
+        except Exception:
+            # Fail open — if MT5 is unavailable, don't block the trade
+            checks["correlation_ok"] = True
+    else:
+        checks["correlation_ok"] = True
 
     # ── Lot size calculation ───────────────────────────────────────────────────
     lot_data = calculate_lot_size(

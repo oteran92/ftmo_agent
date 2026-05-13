@@ -1,0 +1,19 @@
+[Unit]
+Description=FTMO Agent — Market Monitor (MetaApi edition)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ftmo_agent
+Environment="PATH=/opt/ftmo_venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+EnvironmentFile=/opt/ftmo_agent/.env
+ExecStart=/opt/ftmo_venv/bin/python monitor.py --daemon
+Restart=on-failure
+RestartSec=30s
+StandardOutput=append:/opt/ftmo_agent/data/monitor.log
+StandardError=append:/opt/ftmo_agent/data/monitor.log
+
+[Install]
+WantedBy=multi-user.target

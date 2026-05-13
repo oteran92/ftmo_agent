@@ -219,10 +219,36 @@ def run_check() -> dict:
             entry = {"pair": r.get("symbol"), "signal": sig, "bias": r.get("bias", "")}
 
             if sig in ("GO_LONG", "GO_SHORT") and "trade" in r:
-                entry["trade"]     = r["trade"]
-                entry["next_step"] = r.get("next_step", "")
+                entry["trade"]      = r["trade"]
+                entry["next_step"]  = r.get("next_step", "")
+                entry["conviction"] = r.get("conviction", "UNKNOWN")
+                entry["analyst"]    = r.get("analyst", {})
                 actionable.append(entry)
                 alert["action_required"] = True
+
+                # Auto-execute if conviction is HIGH or MEDIUM
+                conviction = r.get("conviction", "UNKNOWN")
+                if conviction in ("HIGH", "MEDIUM"):
+                    try:
+                        from skills.auto_executor import execute_trade
+                        exec_result = execute_trade(r)
+                        entry["auto_executed"] = exec_result.get("executed", False)
+                        entry["exec_result"]   = exec_result
+                        if exec_result.get("executed"):
+                            alert["auto_executed"] = True
+                            print(
+                                f"[Monitor] AUTO-EXECUTED: {sig} {entry['pair']} "
+                                f"{exec_result.get('lots')}L [{conviction}]",
+                                flush=True,
+                            )
+                        else:
+                            print(
+                                f"[Monitor] Auto-exec skipped ({entry['pair']}): "
+                                f"{exec_result.get('reason','?')}",
+                                flush=True,
+                            )
+                    except Exception as ex:
+                        print(f"[Monitor] Auto-executor error: {ex}", flush=True)
             elif sig == "WATCH":
                 entry["note"] = r.get("next_step", "In zone, awaiting confirmation")
             elif sig == "NEWS_CAUTION":
@@ -352,6 +378,95 @@ def _build_email_body(alert: dict) -> str:
                 <td style="padding:4px 0;"><strong>RRR</strong><br>1 : {t.get('rrr')}</td>
               </tr>
             </table>
+          </td>
+        </tr>"""
+
+        # 4-Pillar analyst report sub-row (only for GO signals with analyst data)
+        analyst = s.get("analyst", {})
+        conviction = s.get("conviction", "")
+        if analyst and conviction:
+            conv_colors = {
+                "HIGH":    ("#0d6b2e", "#e6f4ea"),
+                "MEDIUM":  ("#7a5500", "#fff8e1"),
+                "LOW":     ("#8b1a1a", "#fdecea"),
+                "UNKNOWN": ("#555555", "#f5f5f5"),
+            }
+            conv_fg, conv_bg = conv_colors.get(conviction, ("#555", "#f5f5f5"))
+            tech  = analyst.get("technical", {})
+            fund  = analyst.get("fundamental", {})
+            sent  = analyst.get("sentiment", {})
+            stat  = analyst.get("statistical", {})
+            score = analyst.get("score", 0)
+
+            def _score_badge(sc: int) -> str:
+                """Render a small +/- score indicator."""
+                color = "#0d6b2e" if sc > 0 else ("#8b1a1a" if sc < 0 else "#888888")
+                return f'<span style="color:{color};font-weight:700;">{sc:+d}</span>'
+
+            def _truncate(s: str, n: int = 90) -> str:
+                return (s or "")[:n] + ("…" if len(s or "") > n else "")
+
+            pair_rows_html += f"""
+        <tr style="background:#fafafa;border-top:1px dashed #e0e0e0;">
+          <td colspan="4" style="padding:8px 12px 10px 24px;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <tr>
+                <td colspan="2" style="padding:0 0 6px 0;">
+                  <span style="background:{conv_bg};color:{conv_fg};padding:2px 10px;
+                        border-radius:4px;font-weight:700;font-size:12px;
+                        font-family:monospace;">CONVICTION: {conviction}</span>
+                  <span style="color:#888;font-size:11px;margin-left:8px;">
+                    Score {score:+d}/6 &nbsp;|&nbsp; T:{_score_badge(tech.get('score',0))} &nbsp;
+                    F:{_score_badge(fund.get('score',0))} &nbsp;
+                    S:{_score_badge(sent.get('score',0))} &nbsp;
+                    St:{_score_badge(stat.get('score',0))}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:2px 12px 2px 0;color:#555;width:50%;vertical-align:top;">
+                  <strong style="color:#333;">Technical</strong><br>
+                  {_truncate(tech.get('note','—'))}
+                </td>
+                <td style="padding:2px 0;color:#555;vertical-align:top;">
+                  <strong style="color:#333;">Fundamental</strong><br>
+                  {_truncate(fund.get('note','—'))}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:4px 12px 2px 0;color:#555;vertical-align:top;">
+                  <strong style="color:#333;">Sentiment (COT)</strong><br>
+                  {_truncate(sent.get('note','—'))}
+                </td>
+                <td style="padding:4px 0;color:#555;vertical-align:top;">
+                  <strong style="color:#333;">Statistical</strong><br>
+                  {_truncate(stat.get('note','—'))}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>"""
+
+        # Auto-execution status row
+        exec_result = s.get("exec_result")
+        if exec_result:
+            if exec_result.get("executed"):
+                cmd = exec_result.get("command", {})
+                exec_bg, exec_color = "#e6f4ea", "#0d6b2e"
+                exec_msg = (
+                    f"✅ AUTO-EXECUTED: {cmd.get('type')} {exec_result.get('lots')}L "
+                    f"@ {cmd.get('price')} | SL {cmd.get('sl')} | TP {cmd.get('tp')} "
+                    f"| Risk ${exec_result.get('risk_usd')}"
+                )
+            else:
+                exec_bg, exec_color = "#fff8e1", "#7a5500"
+                exec_msg = f"⚠ Manual entry required — {exec_result.get('reason','?')}"
+
+            pair_rows_html += f"""
+        <tr style="background:{exec_bg};">
+          <td colspan="4" style="padding:4px 12px 10px 24px;font-size:12px;
+                                  color:{exec_color};font-family:monospace;">
+            {exec_msg}
           </td>
         </tr>"""
 
@@ -543,7 +658,8 @@ def _build_email_body(alert: dict) -> str:
       <tr style="background:#f8f9fa;border-top:1px solid #e0e0e0;" class="force-light">
         <td style="padding:14px 24px;font-size:12px;color:#aaaaaa;">
           Automated signal — do not trade without your own confirmation.<br>
-          Strategy: EMA Trend + H4 Pullback &nbsp;|&nbsp; Risk: 0.5% per trade
+          Strategy: EMA Trend + H4 Pullback &nbsp;|&nbsp; Risk: 0.5% per trade &nbsp;|&nbsp;
+          Analysis: Technical · Fundamental · Sentiment · Statistical
         </td>
       </tr>
 
@@ -603,7 +719,19 @@ def main() -> None:
 
                 # Determine email priority and subject prefix
                 if alert["action_required"]:
-                    subject = f"FTMO SETUP: {alert['message'][:60]}"
+                    # Include highest conviction level and auto-exec status in subject
+                    convictions = [
+                        s.get("conviction", "") for s in alert["signals"]
+                        if s.get("signal") in ("GO_LONG", "GO_SHORT")
+                    ]
+                    top_conviction = (
+                        "HIGH" if "HIGH" in convictions else
+                        "MEDIUM" if "MEDIUM" in convictions else
+                        convictions[0] if convictions else ""
+                    )
+                    conv_badge = f" [{top_conviction}]" if top_conviction else ""
+                    auto_badge = " ✅AUTO" if alert.get("auto_executed") else " ⚠️MANUAL"
+                    subject = f"FTMO SETUP{conv_badge}{auto_badge}: {alert['message'][:45]}"
                     send_email_alert(subject, _build_email_body(alert))
                 elif any(s.get("signal") == "NEWS_CAUTION" for s in alert["signals"]):
                     subject = f"FTMO NEWS CAUTION: {alert['message'][:60]}"

@@ -1,0 +1,87 @@
+{
+  "_comment": "Central bank stances for G8 currencies. Update manually after each major CB meeting.",
+  "_last_review": "2026-05-12",
+  "_scoring": "hawkish=+2, neutral_hawkish=+1, neutral=0, neutral_dovish=-1, dovish=-2",
+
+  "USD": {
+    "stance": "neutral",
+    "hawk_score": 0,
+    "rate": "4.25-4.50%",
+    "last_meeting": "2026-05-07",
+    "next_meeting": "2026-06-11",
+    "notes": "Fed held rates at 4.25-4.50%. Watching trade war inflation impact. Data-dependent stance.",
+    "bias_trend": "hold"
+  },
+  "EUR": {
+    "stance": "dovish",
+    "hawk_score": -2,
+    "rate": "2.25%",
+    "last_meeting": "2026-04-17",
+    "next_meeting": "2026-06-05",
+    "notes": "ECB in cutting cycle. Deposit rate at 2.25%. Growth concerns and disinflation support further cuts.",
+    "bias_trend": "cutting"
+  },
+  "GBP": {
+    "stance": "neutral_dovish",
+    "hawk_score": -1,
+    "rate": "4.25%",
+    "last_meeting": "2026-05-08",
+    "next_meeting": "2026-06-19",
+    "notes": "BoE cut to 4.25% in May 2026. Gradual cutting cycle. Inflation still above target — cautious pace.",
+    "bias_trend": "cutting"
+  },
+  "JPY": {
+    "stance": "neutral_hawkish",
+    "hawk_score": 1,
+    "rate": "0.50%",
+    "last_meeting": "2026-04-30",
+    "next_meeting": "2026-06-17",
+    "notes": "BoJ normalizing from ultra-loose policy. Rate at 0.5%, signaling further gradual hikes. Hawkish relative to recent history.",
+    "bias_trend": "hiking"
+  },
+  "AUD": {
+    "stance": "dovish",
+    "hawk_score": -2,
+    "rate": "3.85%",
+    "last_meeting": "2026-05-05",
+    "next_meeting": "2026-07-07",
+    "notes": "RBA cut rates in May 2026. Weak domestic demand and easing inflation support dovish stance.",
+    "bias_trend": "cutting"
+  },
+  "CAD": {
+    "stance": "dovish",
+    "hawk_score": -2,
+    "rate": "2.75%",
+    "last_meeting": "2026-04-16",
+    "next_meeting": "2026-06-04",
+    "notes": "BoC in active cutting cycle. Trade war with US weighs on economy. Multiple cuts in 2025-26.",
+    "bias_trend": "cutting"
+  },
+  "CHF": {
+    "stance": "dovish",
+    "hawk_score": -2,
+    "rate": "0.25%",
+    "last_meeting": "2026-03-20",
+    "next_meeting": "2026-06-19",
+    "notes": "SNB cut to 0.25%. Risk of returning to negative rates. Strong CHF concerns persist.",
+    "bias_trend": "cutting"
+  },
+  "NZD": {
+    "stance": "dovish",
+    "hawk_score": -2,
+    "rate": "3.50%",
+    "last_meeting": "2026-04-09",
+    "next_meeting": "2026-05-28",
+    "notes": "RBNZ in cutting cycle. Weak domestic economy. Multiple rate cuts since late 2024.",
+    "bias_trend": "cutting"
+  },
+  "XAU": {
+    "stance": "neutral",
+    "hawk_score": 0,
+    "rate": "N/A",
+    "last_meeting": "N/A",
+    "next_meeting": "N/A",
+    "notes": "Gold — no CB. Use DXY trend and risk sentiment as fundamental context instead.",
+    "bias_trend": "N/A"
+  }
+}

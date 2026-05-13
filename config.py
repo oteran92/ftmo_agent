@@ -57,5 +57,36 @@ STATE_FILE = os.path.join(DATA_DIR, "account_state.json")
 LOG_FILE   = os.path.join(DATA_DIR, "trade_log.json")
 ALERT_FILE = os.path.join(DATA_DIR, "alerts.json")
 
+# ── Trading session windows (UTC hours) ───────────────────────────────────────
+# Academy: London + NY sessions have the highest volume and best setups.
+# Asian session has the LOWEST volume — patterns fail more often.
+TRADING_SESSIONS_UTC: list[tuple[int, int]] = [
+    (8, 16),   # London session (08:00–16:00 UTC)
+    (12, 21),  # New York session (12:00–21:00 UTC)
+]
+
+# ── Preferred trading days (0=Monday … 6=Sunday) ──────────────────────────────
+# Academy: Tuesday, Wednesday, Thursday have highest volume and volatility.
+# Monday morning is slow; Friday afternoon dries up after London close.
+BEST_TRADING_DAYS: set[int] = {1, 2, 3}         # Tue=1, Wed=2, Thu=3
+CAUTION_DAYS: dict[str, tuple[int, int]] = {
+    "monday_morning":   (0, 12),  # weekday=0, hours before 12:00 UTC
+    "friday_afternoon": (4, 16),  # weekday=4, hours at or after 16:00 UTC
+}
+
+# ── Correlation map (pairs sharing strong directional USD exposure) ────────────
+# Academy: EURUSD + GBPUSD open simultaneously = double USD short exposure.
+# Gold (XAUUSD) has negative correlation with USD.
+CORRELATED_PAIRS: dict[str, list[str]] = {
+    "EURUSD": ["GBPUSD", "AUDUSD", "NZDUSD"],
+    "GBPUSD": ["EURUSD", "AUDUSD", "NZDUSD"],
+    "AUDUSD": ["EURUSD", "GBPUSD", "NZDUSD"],
+    "NZDUSD": ["EURUSD", "GBPUSD", "AUDUSD"],
+    "XAUUSD": ["EURUSD", "GBPUSD"],  # Gold negatively correlated with USD strength
+    "USDCAD": [],                     # Oil-correlated but no direct pair conflict
+    "USDCHF": [],
+    "USDJPY": [],
+}
+
 # ── Claude model ───────────────────────────────────────────────────────────────
 CLAUDE_MODEL = "claude-sonnet-4-6"

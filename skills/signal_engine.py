@@ -343,6 +343,28 @@ def analyze_setup(symbol: str = "EURUSD") -> dict[str, Any]:
             f"Live: {round(effective_price,5)}. Wait for pullback."
         )
 
+    # ── 4-Pillar conviction analysis (FTMO Academy methodology) ──────────────────
+    # Runs for every GO signal to assign HIGH / MEDIUM / LOW conviction.
+    # LOW conviction automatically downgrades GO → WATCH to avoid low-quality entries.
+    # Runs BEFORE news filter so the conviction snapshot is always attached.
+    if signal in ("GO_LONG", "GO_SHORT"):
+        try:
+            from skills.market_analyst import run_full_analysis
+            analyst = run_full_analysis(sym, signal)
+            result["conviction"] = analyst["conviction"]
+            result["analyst"]    = analyst
+
+            if analyst["conviction"] == "LOW":
+                # Insufficient multi-pillar alignment — protect capital by waiting
+                result["signal"]    = "WATCH"
+                result["next_step"] = (
+                    f"Signal downgraded WATCH — Low conviction ({analyst['score']:+d}/6). "
+                    f"{analyst['summary']}"
+                )
+        except Exception:
+            # Market analyst is non-critical — never block a valid signal over an analysis error
+            result.setdefault("conviction", "UNKNOWN")
+
     # ── News filter: check calendar AFTER building the technical signal ─────────
     # Runs last so technical analysis is always complete regardless of news.
     try:
