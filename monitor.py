@@ -23,25 +23,23 @@ import json
 import os
 import sys
 import time
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import requests
 
+from config import CEST, MONITORED_PAIRS
+
 BASE_DIR    = Path(__file__).parent
 DATA_DIR    = BASE_DIR / "data"
 ALERTS_FILE = DATA_DIR / "alerts.json"
-
-# User timezone: CEST (UTC+2). MT5 server runs UTC+3.
-CEST = timezone(timedelta(hours=2))
 
 # H4 candle close hours in CEST (UTC+2): MT5 server UTC+3 minus 1h.
 # Closes at 00/04/08/12/16/20 UTC+3 → 23/03/07/11/15/19 CEST.
 H4_CLOSE_HOURS_CEST = {23, 3, 7, 11, 15, 19}
 H4_CHECK_MINUTE     = 3    # fire 3 minutes after close (TwelveData needs a moment to update)
 POLL_INTERVAL       = 30   # wake every 30s to check if it's time to run
-PAIRS               = ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD",
-                       "EURJPY", "GBPJPY", "AUDUSD", "USDCAD", "USDCHF"]
+PAIRS               = MONITORED_PAIRS
 
 
 # ── Time helpers ───────────────────────────────────────────────────────────────
@@ -672,6 +670,44 @@ def _build_email_body(alert: dict) -> str:
     return html
 
 
+# ── Friday position guard ──────────────────────────────────────────────────────
+
+def _check_friday_positions(now: datetime) -> None:
+    """
+    On Friday from 19:00 CEST onwards, check for open positions and send a
+    weekend gap-risk warning. Does not close positions automatically — the
+    operator decides. Runs once per Friday evening H4 scan.
+    """
+    try:
+        from skills.auto_executor import _live_state
+        state     = _live_state()
+        positions = state.get("positions", [])
+        if not positions:
+            return  # nothing open, no warning needed
+
+        pos_summary = "\n".join(
+            f"  • {p.get('symbol','?')} {p.get('type','?').upper()} "
+            f"{p.get('volume','?')} lots | "
+            f"P&amp;L: ${p.get('unrealizedProfit', p.get('profit', 0)):.2f}"
+            for p in positions
+        )
+        subject = f"FTMO WEEKEND RISK: {len(positions)} position(s) open — market closes in ~{22-now.hour}h"
+        body = f"""
+<h2 style="color:#c0392b;">⚠️ Weekend Gap Risk Alert</h2>
+<p>You have <strong>{len(positions)} open position(s)</strong> heading into the weekend.
+The forex market closes Friday ~22:00 CEST and reopens Sunday ~23:00 CEST.</p>
+<pre style="background:#f5f5f5;padding:12px;border-radius:6px;">{pos_summary}</pre>
+<p><strong>Action required:</strong> Decide whether to close before market close
+or accept the gap risk. FTMO does not penalize open positions over the weekend,
+but a large gap on Monday open can trigger the daily loss limit.</p>
+<p style="color:#888;font-size:12px;">Sent automatically by FTMO Monitor at {_now_str()}</p>
+"""
+        send_email_alert(subject, body)
+        print(f"[Monitor] Friday position alert sent — {len(positions)} positions open.", flush=True)
+    except Exception as e:
+        print(f"[Monitor] Friday position check error: {e}", flush=True)
+
+
 # ── Main loop ──────────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -707,6 +743,10 @@ def main() -> None:
                     continue
 
                 print(f"\n[Monitor] {_now_str()} — H4 close detected, running check...", flush=True)
+
+                # Friday 21:00 CEST position alert — warn before weekend gap risk
+                if now.weekday() == 4 and now.hour >= 19:
+                    _check_friday_positions(now)
 
                 alert = run_check()
 

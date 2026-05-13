@@ -140,7 +140,7 @@ def get_pair_stats(pair: str) -> dict[str, Any]:
     }
 
 
-def get_session_stats() -> dict[str, Any]:
+def _get_session_stats() -> dict[str, Any]:
     """
     Return aggregate win/loss stats broken down by trading session.
     Useful for identifying which sessions our strategy performs best in.
@@ -218,7 +218,7 @@ def get_overall_stats() -> dict[str, Any]:
     }
 
 
-def get_session_score_for_trade(opened_at: str) -> int:
+def _get_session_score_for_trade(opened_at: str) -> int:
     """
     Given an opened_at string, check if this session has historically been profitable.
 
@@ -226,7 +226,7 @@ def get_session_score_for_trade(opened_at: str) -> int:
     """
     hour    = _parse_cest_hour(opened_at)
     session = _get_session(hour)
-    stats   = get_session_stats()
+    stats   = _get_session_stats()
 
     if session not in stats:
         return 0

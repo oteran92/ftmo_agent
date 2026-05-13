@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import json
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from pathlib import Path
 
-CEST = timezone(timedelta(hours=2))
+from config import CEST
 
 
 def _now_cest() -> str:
@@ -24,8 +24,8 @@ BASE_DIR = Path(__file__).parent
 
 
 def cmd_status() -> dict:
-    """Live account status from MT5."""
-    from mt5_connector import live_account_summary
+    """Live account status from MetaApi."""
+    from skills.metaapi_client import live_account_summary
     from state import load_state, get_drawdown_pct
     mt5 = live_account_summary()
     state = load_state()
@@ -84,10 +84,10 @@ def cmd_review(pair: str, entry: float, sl: float, tp: float) -> dict:
 
 
 def cmd_positions() -> dict:
-    """Live open positions from MT5."""
-    from mt5_connector import get_positions, is_bridge_connected
+    """Live open positions from MetaApi."""
+    from skills.metaapi_client import get_positions, is_connected
     return {
-        "bridge_connected": is_bridge_connected(),
+        "connected": is_connected(),
         "positions": get_positions(),
     }
 

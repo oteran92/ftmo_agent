@@ -23,12 +23,13 @@ from __future__ import annotations
 import asyncio
 import json
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from config import CEST, PIP_VALUES_USD, PIP_SIZE, MONITORED_PAIRS
+
 BASE_DIR = Path(__file__).parent.parent
-CEST     = timezone(timedelta(hours=2))
 
 # Risk parameters
 _RISK_FRACTION        = 0.005   # 0.5% risk per trade
@@ -37,15 +38,8 @@ _MAX_USD_PAIRS        = 3       # max simultaneous positions containing USD
 _DAILY_HALT_FRACTION  = 0.60    # halt at 60% of daily limit (= 3% loss on $100k)
 _FTMO_DAILY_LIMIT     = 5000.0  # FTMO $100k account daily loss limit
 
-# Pip value per standard lot (USD) — used for lot sizing
-_PIP_VALUES: dict[str, float] = {
-    "EURUSD": 10.0, "GBPUSD": 10.0, "AUDUSD": 10.0, "USDCHF": 10.0,
-    "USDCAD": 7.5,  "USDJPY": 6.5,  "EURJPY": 8.0,  "GBPJPY": 8.0,
-    "XAUUSD": 10.0,
-}
-
 # Pairs that contain USD (for correlation cap)
-_USD_PAIRS = {"EURUSD", "GBPUSD", "AUDUSD", "USDCHF", "USDCAD", "USDJPY", "USDCHF"}
+_USD_PAIRS = {"EURUSD", "GBPUSD", "AUDUSD", "USDCHF", "USDCAD", "USDJPY"}
 
 
 # ── MetaApi async helpers ─────────────────────────────────────────────────────
@@ -93,6 +87,30 @@ async def _fetch_account_state() -> dict:
         "equity":    float(info.get("equity",   100000.0)),
         "positions": positions or [],
     }
+
+
+async def _fetch_price(pair: str) -> dict | None:
+    """Fetch live bid/ask for a symbol. Returns {bid, ask} or None on error."""
+    account_id = os.environ.get("METAAPI_ACCOUNT_ID", "")
+    if not account_id:
+        return None
+    try:
+        api     = _get_api()
+        account = await api.metatrader_account_api.get_account(account_id)
+        if account.state not in ("DEPLOYED", "DEPLOYING"):
+            await account.deploy()
+        await account.wait_connected(timeout_in_seconds=60)
+        conn = account.get_rpc_connection()
+        await conn.connect()
+        await conn.wait_synchronized(timeout_in_seconds=60)
+        tick = await conn.get_symbol_price(pair)
+        await conn.close()
+        api.close()
+        if tick:
+            return {"bid": float(tick.get("bid", 0)), "ask": float(tick.get("ask", 0))}
+    except Exception:
+        pass
+    return None
 
 
 async def _place_order(
@@ -162,7 +180,7 @@ def _todays_pnl(state: dict) -> float:
 def _lots(balance: float, sl_pips: float, pair: str) -> float:
     """Calculate lot size for 0.5% risk given SL in pips."""
     risk_usd  = balance * _RISK_FRACTION
-    pip_value = _PIP_VALUES.get(pair.upper(), 10.0)
+    pip_value = PIP_VALUES_USD.get(pair.upper(), 10.0)
     if sl_pips <= 0:
         return 0.01
     return round(min(max(risk_usd / (sl_pips * pip_value), 0.01), 10.0), 2)
@@ -170,14 +188,27 @@ def _lots(balance: float, sl_pips: float, pair: str) -> float:
 
 def _aggregate_open_risk(positions: list, balance: float) -> float:
     """
-    Estimate total open risk as fraction of balance.
-    Uses unrealized loss proxy: (entry - current) * lots * pip_value.
-    Falls back to 0.5% per position if SL data unavailable.
+    Compute true open risk as fraction of balance using actual SL distances.
+    Formula: |entry - sl| / pip_size × pip_value × volume / balance.
+    Falls back to 0.5% per position when SL or price data is missing.
     """
     total_risk = 0.0
     for p in positions:
-        # Best estimate: use 0.5% per position (conservative proxy)
-        total_risk += _RISK_FRACTION
+        sl     = float(p.get("stopLoss") or 0.0)
+        entry  = float(p.get("openPrice") or 0.0)
+        volume = float(p.get("volume") or 0.0)
+        symbol = (p.get("symbol") or "").upper()
+
+        if sl == 0 or entry == 0 or volume == 0:
+            total_risk += _RISK_FRACTION  # conservative fallback
+            continue
+
+        pip_size  = PIP_SIZE.get(symbol, 0.0001)
+        sl_pips   = abs(entry - sl) / pip_size
+        pip_value = PIP_VALUES_USD.get(symbol, 10.0)
+        risk_usd  = sl_pips * pip_value * volume
+        total_risk += risk_usd / balance if balance > 0 else 0.0
+
     return total_risk
 
 
@@ -270,6 +301,35 @@ def execute_trade(signal: dict, dry_run: bool = False) -> dict[str, Any]:
         pct_used = abs(pnl) / (_FTMO_DAILY_LIMIT / 100)
         warnings.append(f"Today P&L: ${pnl:.0f} ({pct_used:.1f}% of daily limit used).")
 
+    # Guard 7 — slippage + spread check against live bid/ask
+    tick = _run_async(_fetch_price(pair))
+    if tick and tick.get("bid") and tick.get("ask"):
+        pip_size   = PIP_SIZE.get(pair, 0.0001)
+        spread_pips = (tick["ask"] - tick["bid"]) / pip_size
+        if spread_pips > 2.0:
+            return {"executed": False,
+                    "reason": (f"Spread too wide: {spread_pips:.1f} pips on {pair}. "
+                               "Max 2 pips. Will retry on next scan."),
+                    "command": None}
+
+        # Use mid-price for validate_entry check
+        live_price = (tick["bid"] + tick["ask"]) / 2.0
+        try:
+            from skills.signal_engine import validate_entry
+            validation = validate_entry(signal, live_price)
+            if not validation["ok"]:
+                return {"executed": False,
+                        "reason": validation["warning"], "command": None}
+            # Use adjusted SL/TP from live price, not signal price
+            trade = dict(trade)  # copy to avoid mutating caller's dict
+            trade["sl"] = validation["adjusted_sl"]
+            trade["tp"] = validation["adjusted_tp"]
+            warnings.append(validation["warning"])
+        except Exception as exc:
+            warnings.append(f"validate_entry skipped: {exc}")
+    else:
+        warnings.append("Live price unavailable — skipping slippage/spread check.")
+
     sl_pips  = float(trade.get("sl_pips", 15))
     lot_size = _lots(balance, sl_pips, pair)
     risk_usd = round(balance * _RISK_FRACTION, 2)
@@ -304,7 +364,7 @@ def execute_trade(signal: dict, dry_run: bool = False) -> dict[str, Any]:
             command["comment"],
         ))
         order_id = result.get("orderId") or result.get("positionId") or "?"
-        _log(pair, direction, lot_size, trade, conviction, risk_usd, order_id)
+        _log(pair, direction, lot_size, trade, conviction, risk_usd, order_id, signal)
         return {
             "executed":  True,
             "command":   command,
@@ -323,6 +383,7 @@ def execute_trade(signal: dict, dry_run: bool = False) -> dict[str, Any]:
 def _log(
     pair: str, direction: str, lots: float, trade: dict,
     conviction: str, risk_usd: float, order_id: str = "?",
+    signal: dict | None = None,
 ) -> None:
     """Append to data/auto_executions.json for audit trail (keep last 200)."""
     path = BASE_DIR / "data" / "auto_executions.json"
@@ -331,6 +392,7 @@ def _log(
     except Exception:
         records = []
 
+    analyst = signal.get("analyst", {}) if signal else {}
     records.append({
         "timestamp":  datetime.now(CEST).isoformat(),
         "pair":       pair,
@@ -345,5 +407,12 @@ def _log(
         "risk_usd":   risk_usd,
         "order_id":   order_id,
         "via":        "MetaApi",
+        # Conviction breakdown for backtesting signal quality
+        "analyst_snapshot": {
+            "conviction": conviction,
+            "score":      analyst.get("score"),
+            "summary":    analyst.get("summary", ""),
+            "pillars":    analyst.get("pillars", {}),
+        },
     })
     path.write_text(json.dumps(records[-200:], indent=2))

@@ -7,12 +7,11 @@ Called by monitor.py to include a dashboard block in every email.
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-# Central Europe Summer Time = UTC+2
-_CEST = timezone(timedelta(hours=2))
+from config import CEST as _CEST
 
 _STATE_FILE = Path(__file__).parent.parent / "data" / "challenge_state.json"
 
@@ -32,7 +31,7 @@ def save_state(state: dict) -> None:
     _STATE_FILE.write_text(json.dumps(state, indent=2))
 
 
-def update_balance(new_balance: float) -> dict:
+def _update_balance(new_balance: float) -> dict:
     """
     Call after each trade closes or at each scan to refresh metrics.
     Updates high_water_mark, daily_pnl, and last_updated.

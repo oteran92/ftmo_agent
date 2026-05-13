@@ -1,0 +1,1476 @@
+{
+  "source": "FTMO Academy — The Trader's Journey",
+  "last_updated": "2026-05-10T10:31:00+02:00",
+  "certifications_earned": 9,
+
+  "lessons": {
+    "introduction-to-trading": {
+      "url": "https://academy.ftmo.com/lesson/introduction-to-trading/",
+      "module": "Gateway to trading",
+      "lesson_title": "Introduction to trading",
+      "order": 1,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "trading": "The buying and selling of various financial assets to make a profit based on fluctuations in the prices of those assets.",
+        "financial_asset": "Any asset that has a financial value and can be traded. Includes currency pairs, derivatives, stocks, bonds, commodities.",
+        "long_position": "Speculating that an asset's value will increase — enter at a low price (buy), exit at a higher price.",
+        "short_position": "Speculating that an asset's value will decline — enter at the highest possible price (sell), exit at the lowest possible price.",
+        "leverage": "Borrowed capital that allows you to open large positions with little equity. Multiplies both potential profits AND potential losses.",
+        "investor": "Purchases a financial asset at a favourable price expecting long-term appreciation. Becomes the OWNER of the asset. May earn dividends or coupon payments.",
+        "trader": "Seeks profit through speculation, usually in the short to medium term. Does NOT own the underlying asset. Can trade long or short freely.",
+        "volatility": "A measure of the fluctuations in the price of financial assets. Higher volatility instruments (currency pairs, derivatives) suit short-term trading.",
+        "stop_loss": "The maximum acceptable loss per trade — set before entry to limit downside.",
+        "take_profit": "The desired profit level — the price at which a trade is closed with a gain.",
+        "demo_account": "A simulated trading environment using virtual money. Used to practice without financial risk before live trading.",
+        "dividend": "Regular return paid to shareholders by a company — only relevant to investors who own the stock.",
+        "coupon": "Regular annual interest payment received by bondholders."
+      },
+
+      "key_rules": [
+        "Trading is simple but not easy — requires consistent discipline, preparation, and skill development.",
+        "The 90/90/90 rule: 90% of traders lose 90% of their invested capital within 90 days.",
+        "Excessively high earnings expectations are a recipe for long-term failure.",
+        "Most traders lose money in the beginning — this is a hard statistical fact, not an exception.",
+        "FTMO recommends starting on a demo account (FTMO Free Trial) before trading with real money.",
+        "With 100:1 leverage, $1,000 controls a $100,000 EURUSD position (1 lot).",
+        "Without leverage, trading 1 lot of EURUSD requires $100,000 in capital.",
+        "Anyone can become a trader regardless of education, nationality, wealth, or gender.",
+        "Success in trading is determined solely by attitude and ability — markets are non-discriminatory.",
+        "A trader can endure 5–10 consecutive losing trades and must be mentally prepared for this.",
+        "Discipline is a prerequisite for success — without it you cannot climb out of mediocrity.",
+        "Humility is essential — a humble trader admits mistakes and learns from them.",
+        "Trading is a never-ending cycle: skill development → mental preparation → application → analysis → improvement.",
+        "FTMO explicitly states: claims of ~100% success rate by trading gurus are 'unrealistic hogwash'."
+      ],
+
+      "investing_vs_trading": {
+        "investor": {
+          "goal": "Long-term capital appreciation",
+          "owns_asset": true,
+          "profit_source": "Price appreciation over time + dividends/coupons",
+          "direction": "Long only (buys and holds)",
+          "timeframe": "Long term",
+          "instruments": "Stocks, bonds, real assets"
+        },
+        "trader": {
+          "goal": "Short to medium-term profit through speculation",
+          "owns_asset": false,
+          "profit_source": "Price fluctuations (up or down)",
+          "direction": "Long OR Short — no restrictions",
+          "timeframe": "Short to medium term",
+          "instruments": "Currency pairs, derivatives (high volatility preferred)"
+        }
+      },
+
+      "five_essential_trader_qualities": [
+        {
+          "quality": "Persistence (Mental Toughness)",
+          "description": "Endure series of 5–10 consecutive losses without abandoning the strategy. Good and bad periods happen even to consistent traders.",
+          "exam_keyword": "perseverance"
+        },
+        {
+          "quality": "Discipline",
+          "description": "Avoid constantly changing approach and strategy. Many successful traders are athletes trained in discipline from a young age.",
+          "exam_keyword": "discipline"
+        },
+        {
+          "quality": "Humility",
+          "description": "Admit mistakes, learn from them, do not overestimate abilities. A humble trader keeps emotions in check and does not blame others for losses.",
+          "exam_keyword": "humility"
+        },
+        {
+          "quality": "Psychological Well-Being",
+          "description": "One of the MOST IMPORTANT factors for forex success. Self-knowledge and self-development are key. FTMO dedicates an extensive chapter to this.",
+          "exam_keyword": "psychology"
+        },
+        {
+          "quality": "Curiosity and Willingness to Learn",
+          "description": "Without enthusiasm for the subject, persistence alone fades. Constant learning and skill improvement are required.",
+          "exam_keyword": "curiosity / willingness to learn"
+        }
+      ],
+
+      "leverage_example": {
+        "instrument": "EURUSD",
+        "lot_size": "1 lot",
+        "without_leverage": "$100,000 required",
+        "with_100_1_leverage": "$1,000 required",
+        "formula": "Required margin = Position size / Leverage ratio"
+      },
+
+      "exam_qa": [
+        {
+          "q": "What is trading?",
+          "a": "The buying and selling of financial assets to make a profit based on price fluctuations.",
+          "why": "Exact FTMO Academy definition from 'What is trading?' section."
+        },
+        {
+          "q": "What is the key difference between a trader and an investor?",
+          "a": "A trader does not own the underlying asset and speculates in the short to medium term; an investor owns the asset and seeks long-term appreciation.",
+          "why": "From 'Investing vs Trading' section — the distinction is ownership of the asset and time horizon."
+        },
+        {
+          "q": "In a long position, how does the trader make a profit?",
+          "a": "By entering (buying) at a low price and exiting at a higher price.",
+          "why": "'In a long position, traders speculate on the asset's value increasing. They aim to enter the position at a low price (buy) and exit at a higher price.'"
+        },
+        {
+          "q": "In a short position, how does the trader make a profit?",
+          "a": "By entering (selling) at the highest possible price and exiting at the lowest possible price.",
+          "why": "'When speculating on a decline in the value of an asset (short position), they enter the position at the highest possible price (sell) and exit the position at the lowest possible price.'"
+        },
+        {
+          "q": "What is leverage?",
+          "a": "Borrowed capital that allows traders to open large positions with very little equity, multiplying both potential profits and potential losses.",
+          "why": "From 'Investing vs Trading' section: 'Leverage allows you to open large positions with very little equity thanks to borrowed capital.'"
+        },
+        {
+          "q": "How much capital is needed to trade 1 lot of EURUSD with 100:1 leverage?",
+          "a": "$1,000",
+          "why": "FTMO Academy example: without leverage = $100,000; with 100:1 leverage = $1,000."
+        },
+        {
+          "q": "What is the 90/90/90 rule?",
+          "a": "90% of traders will lose 90% of their invested capital within 90 days.",
+          "why": "'The 90/90/90 rule states that 90% of traders will lose 90% of their invested capital within 90 days.'"
+        },
+        {
+          "q": "According to FTMO, who can become a trader?",
+          "a": "Anyone — regardless of education, nationality, location, family wealth, or gender. Outcomes are determined solely by attitude and ability.",
+          "why": "'According to FTMO data, traders come from diverse backgrounds... outcomes are determined solely by one's attitude and ability.'"
+        },
+        {
+          "q": "What does FTMO say about high earnings expectations?",
+          "a": "Excessively high expectations are a recipe for long-term failure. Traders must be realistic.",
+          "why": "'Having excessively high expectations is a recipe for long-term failure.'"
+        },
+        {
+          "q": "What is a Stop Loss?",
+          "a": "The maximum acceptable loss per trade — set before entry to limit downside.",
+          "why": "Defined in 'Where to Start?' section when describing demo account practice."
+        },
+        {
+          "q": "What is a Take Profit?",
+          "a": "The desired profit level — the price target at which a trade is automatically closed with a gain.",
+          "why": "Defined in 'Where to Start?' section alongside Stop Loss."
+        },
+        {
+          "q": "Why are currency pairs and derivatives suitable for short-term trading?",
+          "a": "Because of their higher volatility — they experience larger price fluctuations that traders can capitalize on in short timeframes.",
+          "why": "'Due to their higher volatility (a measure of the fluctuations in the price of financial assets), currency pairs and derivatives are suitable for these short-term trades.'"
+        },
+        {
+          "q": "Which of the following is NOT listed by FTMO as an essential trader quality?",
+          "a": "Mathematical excellence — FTMO explicitly says you do NOT need to excel at mathematics, macroeconomics, or chess.",
+          "why": "'Most people think that only someone who knows macroeconomics and microeconomics, excels in mathematics and is great at chess can become a trader. The reality is that you need slightly different qualities.'"
+        },
+        {
+          "q": "Why does discipline help traders according to FTMO?",
+          "a": "Discipline prevents constantly changing approach and strategy when things feel like they're not working, avoiding mediocrity.",
+          "why": "'Discipline will help you avoid the phase where you constantly change your approach and strategy because you feel that it's not working.'"
+        },
+        {
+          "q": "What is volatility?",
+          "a": "A measure of the fluctuations in the price of financial assets.",
+          "why": "Exact FTMO Academy definition in the 'Investing vs Trading' section."
+        },
+        {
+          "q": "What does FTMO recommend before transitioning to real trading?",
+          "a": "Practice on a demo account (FTMO Free Trial) to familiarise yourself with the platform, execute trades under real market conditions, and test basic strategies.",
+          "why": "'Before transitioning to real trading after studying our materials, practice with mock trading on a demo account.'"
+        },
+        {
+          "q": "Trading is a never-ending process of:",
+          "a": "Learning and improving skills, with consistency as the ultimate goal — in attitude, preparation, daily routine, and profitable trades.",
+          "why": "'It will be a never-ending process of learning and improving your skills with one goal, and that is consistency.'"
+        },
+        {
+          "q": "What additional return can investors earn beyond price appreciation?",
+          "a": "Dividends (from stocks) and coupon payments (from bonds).",
+          "why": "'Additionally, investors may earn regular returns from owning the asset itself... dividends... bondholders receive regular annual interest payments in the form of coupons.'"
+        }
+      ],
+
+      "trading_agent_insights": [
+        "The 90/90/90 rule confirms that rapid aggressive trading destroys accounts — this validates the agent's 0.5% risk-per-trade rule.",
+        "FTMO itself teaches that persistence through losing streaks is required — the agent's 2-consecutive-loss halt rule is a discipline mechanism, not a failure signal.",
+        "Humility principle: the agent's mandatory trade review before every entry forces the trader to admit when conditions are not ideal rather than forcing trades.",
+        "Psychological well-being is FTMO's most important factor — the agent's daily halt after losses is a psychological protection mechanism endorsed by FTMO.",
+        "Demo account (Free Trial) first — validates the current strategy of trading on FTMO Free Trial before paying for the real challenge.",
+        "Unrealistic expectations cause failure — the agent should reinforce patient, process-focused trading over profit-chasing behavior."
+      ]
+    },
+
+    "traders-dictionary": {
+      "url": "https://academy.ftmo.com/lesson/traders-dictionary/",
+      "module": "Gateway to trading",
+      "lesson_title": "Trader's Dictionary",
+      "order": 2,
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-09",
+
+      "key_concepts": {
+        "forex": "Short for FOReign EXchange. A decentralised global market where all the world's currencies are traded. Operates as an over-the-counter (OTC) market — no centralised location. Largest and most liquid market globally with a daily trading volume exceeding $7.5 trillion (as of 2022).",
+        "currency_pair": "Two different currencies quoted against each other. The first currency is the BASE currency; the second is the QUOTED currency (benchmark). The exchange rate indicates how many units of the quoted currency are needed to purchase ONE unit of the base currency.",
+        "base_currency": "The first currency in a currency pair (e.g. EUR in EUR/USD). The exchange rate shows how many units of the quoted currency are needed to buy one unit of this currency.",
+        "quoted_currency": "The second currency in a currency pair (e.g. USD in EUR/USD). Acts as the REFERRING benchmark. NOTE: FTMO uses 'referring benchmark' — not 'basic benchmark'. Exam trap.",
+        "leverage": "Using borrowed capital to amplify the size of a trading account and positions. Allows traders to execute trades with significantly more capital than they actually have. Increases both potential profits AND potential losses.",
+        "margin": "A deposit or advance held by a broker where a trader has an account. Enables traders to open positions on currency pairs or other instruments. Serves as assurance that the trader has enough funds to cover potential losses.",
+        "lot": "A standardised measure of the quantity of a financial instrument available for trading. In forex, the standard lot size is 100,000 units of a particular currency.",
+        "pip": "Price Interest Point (or Points in Percentage). The fundamental unit of currency movement in Forex. Represents 1/10,000th (0.0001) of the currency rate. Example: EUR/USD moving from 1.1000 to 1.1001 = 1 pip.",
+        "bid": "The price at which a trader is willing to BUY a particular asset.",
+        "ask": "The price at which a trader is willing to SELL an asset.",
+        "spread": "The difference between the buy (bid) and sell (ask) prices.",
+        "long": "Buying an asset with the expectation that its price will rise. The trader buys intending to sell later at a higher price.",
+        "short": "Selling an asset with the expectation that its price will fall. The trader sells now intending to buy back later at a lower price.",
+        "buy_order": "An order to buy a financial asset to speculate on the appreciation/increase of the exchange rate or price.",
+        "sell_order": "An order to sell a financial asset to speculate on the depreciation/decline of the exchange rate or price.",
+        "market_order": "An order that executes the trade at the best available price at the time of placing the order.",
+        "limit_order": "An order to execute a trade at a more FAVOURABLE price than the current market price. For a LONG position: placed BELOW current price (wait for price to drop). For a SHORT position: placed ABOVE current price. May not execute if the price only briefly touches the level.",
+        "stop_order": "Used when anticipating the CONTINUATION of current price movements. For a LONG: placed ABOVE current price. For a SHORT: placed BELOW current price. Acts as a market order when triggered — subject to slippage in low-liquidity or volatile markets.",
+        "stop_limit_order": "A combination of Stop and Limit orders. Improved version of a Stop order that avoids slippage by triggering a Limit price when the Stop level is reached. The Limit price is the 'worst' price the trader is willing to accept. May not execute if price doesn't reach the Limit level after triggering the Stop.",
+        "stop_loss": "A type of Stop order that closes a position when price moves AGAINST the trader. Represents the maximum loss the trader is willing to accept on a trade. For a long: placed BELOW entry price. Can be adjusted (trailed) to lock in profits as the trade moves in favour.",
+        "take_profit": "A Limit order that closes an open position when price reaches the trader's target profit level. For a long: placed ABOVE entry price. For a short: placed BELOW entry price. Can be adjusted as the trade progresses.",
+        "trailing_stop": "A dynamic Stop Loss that adjusts automatically according to the asset's price movement in the trader's favour. Activates only when a predetermined profit level is reached. Example: Trailing Stop at 25 points — once 25 points of profit is achieved, the SL moves to Break Even; it continues adjusting with each further favourable move. If no Take Profit is set, the trade stays open until price reverses 25 points.",
+        "candlestick_chart": "A visual depiction of price fluctuations. Shows the trading range within a specified timeframe: open, close, low, and high prices. The candle colour indicates whether price increased (typically green/white) or decreased (typically red/black) during that period.",
+        "volatility": "The degree of price fluctuation of a given asset. Reflects the degree of uncertainty and risk associated with an investment. Greater volatility = greater price range. High volatility means wider swings; low volatility means tighter, calmer price movement.",
+        "broker": "A company that arranges trades in the financial markets for traders in return for a commission.",
+        "modern_prop_trading": "Prop trading firms that seek out novice traders and provide them with tools, education, and environment to develop trading skills. They identify and educate potential traders without financial risk to their clients."
+      },
+
+      "key_rules": [
+        "Forex is OTC (over-the-counter) — no centralised exchange location.",
+        "Forex daily volume: $7.5 trillion (as of 2022) — largest and most liquid market globally.",
+        "Standard forex lot = 100,000 units of the base currency.",
+        "1 pip = 0.0001 = 1/10,000th of the currency rate.",
+        "Bid = buy price; Ask = sell price; Spread = Ask minus Bid.",
+        "Limit Order is placed at a MORE FAVOURABLE price than current; Stop Order anticipates CONTINUATION of current move.",
+        "Stop Order acts as a market order when triggered — beware slippage in volatile conditions.",
+        "Stop Limit Order adds a Limit level to a Stop to control maximum slippage — 'worst price willing to accept'.",
+        "Trailing Stop is DYNAMIC — moves automatically with price in the trader's favour; activates only after predetermined profit threshold.",
+        "Stop Loss for long position = placed BELOW entry price.",
+        "Take Profit for long position = placed ABOVE entry price.",
+        "Stop Loss for short position = placed ABOVE entry price.",
+        "Take Profit for short position = placed BELOW entry price.",
+        "EUR/USD long position = speculating EUR appreciates and/or USD depreciates.",
+        "EUR/USD short position = speculating EUR depreciates and/or USD appreciates.",
+        "Candlestick shows four price points: open, close, high, low — within a specified timeframe.",
+        "Broker earns commission — not the same as a prop firm."
+      ],
+
+      "order_types_comparison": {
+        "market_order": {
+          "execution": "Immediately at best available price",
+          "use_case": "When speed of execution matters more than exact price",
+          "slippage_risk": "Yes — especially in volatile markets"
+        },
+        "limit_order": {
+          "execution": "At specified price or better (more favourable than current)",
+          "long_placement": "BELOW current price",
+          "short_placement": "ABOVE current price",
+          "slippage_risk": "No — guaranteed price if filled",
+          "risk": "May not fill at all if price doesn't reach the level"
+        },
+        "stop_order": {
+          "execution": "Becomes a market order when Stop level is reached",
+          "long_placement": "ABOVE current price (breakout buy)",
+          "short_placement": "BELOW current price (breakout sell)",
+          "slippage_risk": "Yes — acts as market order when triggered",
+          "use_case": "Anticipating continuation of current trend"
+        },
+        "stop_limit_order": {
+          "execution": "Triggers Limit order when Stop level is reached",
+          "slippage_risk": "Controlled — Limit price is 'worst' price accepted",
+          "risk": "May not execute if price gaps through Limit level"
+        }
+      },
+
+      "exam_qa": [
+        {
+          "q": "What does Forex stand for?",
+          "a": "FOReign EXchange.",
+          "why": "'Short for FOReign EXchange, it is a decentralised global market where all the world's currencies are traded.'"
+        },
+        {
+          "q": "What type of market is Forex?",
+          "a": "An over-the-counter (OTC) decentralised market — there is no centralised location.",
+          "why": "'It operates as an over-the-counter market, meaning there is no centralised location.'"
+        },
+        {
+          "q": "What is the daily trading volume of the Forex market (as of 2022)?",
+          "a": "Exceeding $7.5 trillion.",
+          "why": "'As the largest and most liquid market globally, it boasts a daily trading volume exceeding $7.5 trillion (as of 2022).'"
+        },
+        {
+          "q": "In the EUR/USD pair, which is the base currency and which is the quoted currency?",
+          "a": "EUR is the base currency; USD is the quoted currency.",
+          "why": "'The first currency of the pair is known as the base currency... in the EUR/USD pair, the euro (EUR) is the base currency, and the US dollar (USD) is the quoted currency.'"
+        },
+        {
+          "q": "What is the purpose of a quoted currency in a currency pair?",
+          "a": "The quoted currency is the second currency in a currency pair and serves as a REFERRING benchmark.",
+          "why": "Confirmed correct on FTMO exam 2026-05-09. FTMO's wording is 'referring benchmark' — NOT 'basic benchmark'. The quoted currency is always the SECOND currency (not the first).",
+          "exam_trap": "Both 'referring' and 'basic' sound plausible — FTMO chose 'referring'. Selecting 'basic benchmark' is WRONG even though the lesson text just says 'acting as the benchmark' without a qualifier."
+        },
+        {
+          "q": "What does the exchange rate of a currency pair indicate?",
+          "a": "How many units of the quoted currency are required to purchase one unit of the base currency.",
+          "why": "'The exchange rate of a currency pair indicates how many units of the quoted currency are required to purchase one unit of the base currency.'"
+        },
+        {
+          "q": "What is Margin?",
+          "a": "A deposit or advance held by a broker that enables traders to open positions and serves as assurance they have enough funds to cover potential losses.",
+          "why": "'Margin, in simple terms, is a deposit or advance held by a broker... serves as assurance that they have enough funds to cover potential losses.'"
+        },
+        {
+          "q": "What is the standard lot size in forex trading?",
+          "a": "100,000 units of a particular currency.",
+          "why": "'In forex trading, the standard lot size is 100,000 units of a particular currency.'"
+        },
+        {
+          "q": "What is a pip?",
+          "a": "Price Interest Point (or Points in Percentage) — the fundamental unit of currency movement in Forex, representing 1/10,000th of the currency rate.",
+          "why": "'Pip (Price Interest Point, or Points in Percentage) is the fundamental unit of currency movement in Forex, representing 1/10,000th of the currency rate.'"
+        },
+        {
+          "q": "If EUR/USD moves from 1.1000 to 1.1001, how many pips did it move?",
+          "a": "1 pip.",
+          "why": "'If the EUR/USD price shifts from 1.1000 to 1.1001, this reflects a movement of 1 pip.'"
+        },
+        {
+          "q": "What is the Bid price?",
+          "a": "The price at which a trader is willing to BUY a particular asset.",
+          "why": "Exact FTMO Academy definition: 'The price at which a trader is willing to buy a particular asset.'"
+        },
+        {
+          "q": "What is the Ask price?",
+          "a": "The price at which a trader is willing to SELL an asset.",
+          "why": "Exact FTMO Academy definition: 'The price at which a trader is willing to sell an asset.'"
+        },
+        {
+          "q": "What is the Spread?",
+          "a": "The difference between the buy (bid) and sell (ask) prices.",
+          "why": "Exact FTMO Academy definition: 'The difference between the buy (bid) and sell (ask) prices.'"
+        },
+        {
+          "q": "What is a long position?",
+          "a": "Buying an asset expecting its price to rise — buy intending to sell later at a higher price.",
+          "why": "'Long position means buying an asset with the expectation that its price will rise... the trader buys with the intention of selling later at a higher price.'"
+        },
+        {
+          "q": "What is a short position?",
+          "a": "Selling an asset expecting its price to fall — sell now intending to buy back later at a lower price.",
+          "why": "'Short position means selling an asset with the expectation that its price will fall... selling now with the intention of buying back later at a lower price.'"
+        },
+        {
+          "q": "What is a Market Order?",
+          "a": "An order that executes the trade at the best available price at the time of placing the order.",
+          "why": "'A Market order means the trader will execute the trade at the best available price at the time of placing the order.'"
+        },
+        {
+          "q": "For a Limit Order on a long position, where is it placed relative to current price?",
+          "a": "BELOW the current price — the price must first drop to or below the specified level for the buy order to execute.",
+          "why": "'When seeking to open a long position, the trader enters a Limit order below the current price; thus, the price must first drop to or below the specified level.'"
+        },
+        {
+          "q": "For a Stop Order on a long position, where is it placed relative to current price?",
+          "a": "ABOVE the current price — anticipating continuation of the upward move (breakout buy).",
+          "why": "'For a long position, the trader places a Stop order above the current price.'"
+        },
+        {
+          "q": "What is the main risk of a Stop Order?",
+          "a": "Slippage — it acts as a market order when triggered, so in low liquidity or volatile markets the fill price may be worse than expected.",
+          "why": "'Essentially, a stop order acts as a market order, executed at the best available price. Therefore, traders must consider potential slippage, especially in low liquidity or volatile markets.'"
+        },
+        {
+          "q": "What problem does the Stop Limit Order solve compared to a plain Stop Order?",
+          "a": "It prevents negative slippage by triggering a Limit price (the 'worst' price willing to accept) when the Stop level is reached.",
+          "why": "'A Stop Limit order solves this problem by triggering the Limit price when the Stop level is reached, which is the worst price a trader is willing to accept.'"
+        },
+        {
+          "q": "What is a Stop Loss?",
+          "a": "A type of Stop order that closes a position when price moves against the trader, representing the maximum loss the trader is willing to accept.",
+          "why": "'A Stop Loss order is a type of Stop order used to close a position when the price does not move as anticipated... It represents the maximum loss the trader is willing to accept on a trade.'"
+        },
+        {
+          "q": "For a long position, where is the Stop Loss typically placed?",
+          "a": "Below the entry price.",
+          "why": "'For a long position, the Stop Loss is typically placed below the entry price.'"
+        },
+        {
+          "q": "What is a Take Profit?",
+          "a": "A Limit order designed to close an open position at the trader's target profit level. For a long: placed above entry price.",
+          "why": "'A Take Profit order is a limit order designed to close an open position that is moving in the direction of the trader's trade entry.'"
+        },
+        {
+          "q": "What is a Trailing Stop?",
+          "a": "A dynamic Stop Loss that adjusts automatically in the trader's favour as price moves. Activates only after a predetermined profit level is reached.",
+          "why": "'A specific type of Stop Loss order is the Trailing Stop... it is a dynamic order that adjusts according to the asset's price movement in the trader's favour. It activates only when a predetermined profit level is reached.'"
+        },
+        {
+          "q": "If a Trailing Stop is set at 25 points and the trade reaches 25 points of profit, what happens to the Stop Loss?",
+          "a": "The Stop Loss moves to the Break Even level and continues moving with each further favourable price movement.",
+          "why": "'If a trader sets a Trailing Stop at 25 points, once this profit threshold is achieved, the Stop Loss will adjust to the Break Even level. Subsequently, it continues to move with each further favourable movement.'"
+        },
+        {
+          "q": "What four prices does a candlestick display?",
+          "a": "Open, Close, Low, and High prices within the specified timeframe.",
+          "why": "'On a candlestick chart, traders can observe... the open, close, low, and high prices.'"
+        },
+        {
+          "q": "What does volatility reflect besides price fluctuation range?",
+          "a": "The degree of uncertainty and risk associated with an investment.",
+          "why": "'It also reflects the degree of uncertainty and risk associated with an investment.'"
+        },
+        {
+          "q": "What is a Broker?",
+          "a": "A company that arranges trades in the financial markets for traders in return for a commission.",
+          "why": "Exact FTMO Academy definition: 'A company that arranges trades in the financial markets for traders in return for a commission.'"
+        },
+        {
+          "q": "What is Modern Prop Trading?",
+          "a": "Firms that seek out novice traders and provide tools, education, and environment to develop trading skills — without financial risk to the clients.",
+          "why": "'Modern prop trading firms are companies whose goal is to seek out novice traders and provide them with the tools, education, and environment to experiment with their trading skills... without risk of financial loss on the part of their clients.'"
+        },
+        {
+          "q": "When you open a long position on EUR/USD, what are you speculating on?",
+          "a": "An increase in the value of the euro and/or a decrease in the value of the US dollar.",
+          "why": "'When you open a long position on the EUR/USD currency pair, you are speculating on an increase in the value of the euro and/or a decrease in the value of the US dollar.'"
+        },
+        {
+          "q": "When you open a short position on EUR/USD, what are you speculating on?",
+          "a": "A decrease in the value of the euro and/or an increase in the value of the US dollar.",
+          "why": "'Conversely, when you open a short position on this currency pair, you are speculating on a decrease in the value of the euro and/or an increase in the value of the US dollar.'"
+        }
+      ],
+
+      "trading_agent_insights": [
+        "Bid/Ask spread is the broker's implicit cost — agent must factor spread into pip-based calculations when evaluating RRR.",
+        "Stop Order triggers at market price (slippage risk) — agent uses Limit Orders for controlled entries, Stop Orders only for breakout confirmation.",
+        "Trailing Stop is the preferred mechanism for locking profits — agent already implements this ('Trail SL to breakeven after 1:1 reached').",
+        "Standard lot = 100,000 units — agent lot size calculation for 0.5% risk must always reference this base unit.",
+        "Margin is the broker's collateral requirement — agent must never allow open trades to reduce free margin below safe threshold.",
+        "Pip value is fixed at 0.0001 for most pairs — agent uses this for precise SL/TP distance calculation in pip terms."
+      ]
+    },
+
+    "first-trade-execution": {
+      "url": "https://academy.ftmo.com/lesson/first-trade-execution/",
+      "module": "Gateway to trading",
+      "lesson_title": "First trade execution",
+      "order": 3,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "trade_execution": "The act of placing a Buy or Sell order in the market. Trading is basically very simple — no specific skills are required to execute the trade itself.",
+        "pre_trade_checklist": "Before each trade you must know: (1) WHY you are entering it, (2) at WHAT PRICE you will enter, (3) what POSITION SIZE you will choose.",
+        "position_size": "Determines the size of your profit or loss. Choosing the right position size is critical before every trade.",
+        "stop_loss_purpose": "Set to PREVENT EXCESSIVE LOSSES — it is crucial to set before every trade.",
+        "take_profit_purpose": "Set to SECURE YOUR DESIRED PROFIT — it is crucial to set before every trade.",
+        "long_term_profitability_rule": "For long-term profitability, your Take Profit should EXCEED your Stop Loss — ensuring profits outweigh losses.",
+        "buy_order": "Used when you want to speculate on a RISING price.",
+        "sell_order": "Used when you want to speculate on a FALLING price."
+      },
+
+      "key_rules": [
+        "Trading is basically very simple — you do NOT need specific skills to execute the trade itself.",
+        "Before every trade: know WHY, at WHAT PRICE, and with WHAT POSITION SIZE.",
+        "Position size determines the size of profit or loss.",
+        "Stop Loss is CRUCIAL — prevents excessive losses.",
+        "Take Profit is CRUCIAL — secures desired profit.",
+        "For long-term profitability: Take Profit MUST EXCEED Stop Loss.",
+        "Speculating on rising price → click BUY.",
+        "Speculating on falling price → click SELL."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "What should you know before executing a trade?",
+          "a": "Why you are entering the trade, at what price, and what position size you will choose.",
+          "why": "'Before each trade you should make sure you know why you are entering it, at what price and what position size you will choose.'"
+        },
+        {
+          "q": "What determines the size of your profit or loss?",
+          "a": "The size of the position (position size).",
+          "why": "'The size of the position will determine the size of your profit or loss.'"
+        },
+        {
+          "q": "What is the purpose of setting a Stop Loss?",
+          "a": "To prevent excessive losses.",
+          "why": "'It's crucial to set a Stop Loss to prevent excessive losses.'"
+        },
+        {
+          "q": "What is the purpose of setting a Take Profit?",
+          "a": "To secure your desired profit.",
+          "why": "'[Set] a Take Profit to secure your desired profit.'"
+        },
+        {
+          "q": "For long-term profitability, what is the relationship between Take Profit and Stop Loss?",
+          "a": "Take Profit should EXCEED (be greater than) Stop Loss — so profits outweigh losses.",
+          "why": "'Typically, for long-term profitability, your Take Profit should exceed your Stop Loss, ensuring that profits outweigh losses.'"
+        },
+        {
+          "q": "When do you click BUY?",
+          "a": "When you want to speculate on a rising price.",
+          "why": "'When you want to speculate on a rising price, click on Buy.'"
+        },
+        {
+          "q": "When do you click SELL?",
+          "a": "When you want to speculate on a falling price.",
+          "why": "'When you want to speculate on a falling price, click on Sell.'"
+        },
+        {
+          "q": "Is it difficult to execute a trade?",
+          "a": "No — trading is basically very simple and you do not need any specific skills to execute the trade itself.",
+          "why": "'Trading is basically very simple. You will not need any specific skills to execute the trade itself.'"
+        }
+      ],
+
+      "trading_agent_insights": [
+        "FTMO confirms: Take Profit MUST exceed Stop Loss for long-term profitability — this is the mathematical basis for the agent's minimum 2:1 RRR rule.",
+        "Position size is the primary lever for controlling risk — agent's 0.5% risk rule is the direct implementation of this FTMO principle.",
+        "Know WHY before entering — agent's mandatory pre-trade review enforces this exact checklist (setup, session, news, RRR)."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-09"
+    },
+
+    "introduction-to-financial-markets": {
+      "url": "https://academy.ftmo.com/lesson/introduction-to-financial-markets/",
+      "module": "Financial Markets",
+      "lesson_title": "Introduction to Financial Markets",
+      "order": 4,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "financial_market": "A place that provides the ability to exchange different financial assets (foreign currencies, stocks, bonds, commodities, etc.) in exchange for money.",
+        "capital_market": "One of the main parts of the financial market. Investors and issuers meet at the exchange every day. Issuers gain funds; investors gain ROI.",
+        "clearing": "The settlement of trades at a centralized exchange.",
+        "course": "The price obtained through the double-sided auction of supply and demand at an exchange.",
+        "centralized_exchange": "Characterized by the settlement of a transaction between buyer and seller. It is the central place where price is determined. Heavily regulated, completely transparent, high standardization, capital demanding.",
+        "decentralized_exchange": "Not physically or logically linked to one particular place. Operates through a link between participants, without a central authority. Less transparent, less regulated, lower costs via competition and leverage.",
+        "otc_market": "Over-the-counter market — a decentralized market without a central physical position. Participants trade through telephone, email, and proprietary e-commerce systems. Traders act as MARKET MAKERS. Trades can be made without others knowing the price → LESS TRANSPARENT. Subject to LESS regulation than stock exchanges. Primarily used for bonds, currencies, derivatives, and structured products.",
+        "forex": "The currency market — largest and most liquid financial market in the world. Open 24 hours a day, 5 days a week (Asian, European, North American sessions). Daily volume ~$7.5 trillion (2022, source: bis.org). Decentralized OTC market — no specific trading floor."
+      },
+
+      "world_exchanges": {
+        "NYSE": "New York Stock Exchange (USA) — THE LARGEST exchange in the world measured by market value of securities traded.",
+        "NASDAQ": "National Association of Securities Dealers Automated Quotations (USA) — major exchange in the technology sector.",
+        "Euronext": "European New Exchange Technology (Europe).",
+        "FWB": "Frankfurter Wertpapierbörse — Frankfurt Stock Exchange (Germany).",
+        "LSE": "London Stock Exchange (United Kingdom).",
+        "TSE": "Tokyo Stock Exchange (Japan)."
+      },
+
+      "centralized_vs_decentralized": {
+        "centralized": {
+          "transparency": "COMPLETELY TRANSPARENT",
+          "regulation": "HEAVILY REGULATED — always",
+          "standardization": "High — uniform price, contract sizes, trading hours for all brokers",
+          "capital": "Highly capital demanding",
+          "price_determination": "Central place — clearing"
+        },
+        "decentralized": {
+          "transparency": "LESS TRANSPARENT — trades between two parties without others knowing the price",
+          "regulation": "LESS REGULATED than stock exchanges",
+          "standardization": "Different conditions, contract sizes, prices vary between brokers",
+          "capital": "Lower costs due to broker competition + leverage effect",
+          "forex_is": "OTC — decentralized"
+        }
+      },
+
+      "key_rules": [
+        "NYSE is the LARGEST exchange in the world (by market value of securities traded).",
+        "NASDAQ is the major technology sector centralized exchange.",
+        "Centralized markets are HEAVILY REGULATED and COMPLETELY TRANSPARENT — always.",
+        "OTC markets are LESS TRANSPARENT and subject to LESS REGULATION than stock exchanges.",
+        "Forex is OTC — no central trading floor, no clearing house.",
+        "Forex is open 24 hours a day, 5 days a week (NOT weekends, NOT 7 days).",
+        "Forex standard hours: 5 p.m. EST Sunday to 4 p.m. EST Friday.",
+        "Forex daily volume: ~$7.5 trillion (2022) — 10–15x more than global stock markets combined.",
+        "In OTC markets, TRADERS ACT AS MARKET MAKERS — they state buy and sell prices.",
+        "OTC is less transparent because trades can be made without others knowing the price.",
+        "Decentralized market: clients control own resources, no central server, no KYC required, respects privacy.",
+        "CFDs are a valid instrument to trade Forex — answer is YES."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "Why is OTC being considered less transparent?",
+          "a": "Volume and depth of the market cannot be seen.",
+          "why": "'A trade can be made between two participants in the OTC market without others being aware of the price at which the transaction was completed. In general, the OTC market is usually less transparent than stock exchanges.' Eliminate 'heavily regulated' — OTC has LESS regulation, not more."
+        },
+        {
+          "q": "Name a major centralized stock exchange in the technology sector.",
+          "a": "NASDAQ — National Association of Securities Dealers Automated Quotations (USA).",
+          "why": "NASDAQ is explicitly listed in the lesson as a major centralized exchange. It is globally known as the technology-focused exchange. Hong Kong is not mentioned in the lesson."
+        },
+        {
+          "q": "Is it possible to trade Forex through CFDs?",
+          "a": "Yes.",
+          "why": "CFDs (Contracts for Difference) are the standard instrument used to trade forex in decentralized/OTC markets including at FTMO. The lesson establishes forex as a decentralized OTC market accessible to almost everyone through online trading."
+        },
+        {
+          "q": "Is it true that centralized financial markets are typically not regulated?",
+          "a": "No, they are always regulated.",
+          "why": "'The market is heavily regulated and completely transparent.' Centralized markets are ALWAYS heavily regulated — the statement is false."
+        },
+        {
+          "q": "Which stock exchange is the largest in the world?",
+          "a": "New York Stock Exchange (NYSE).",
+          "why": "Exact FTMO lesson text: 'NYSE – New York Stock Exchange (USA) – The largest exchange in the world as measured by the market value of securities traded.'"
+        },
+        {
+          "q": "Which type of market is more transparent: centralized or decentralized?",
+          "a": "Centralized.",
+          "why": "'The market is heavily regulated and completely transparent' (centralized). 'The OTC market is usually less transparent than stock exchanges' (decentralized)."
+        },
+        {
+          "q": "What is the general name of the market where transactions are held between buyers and sellers?",
+          "a": "Centralized market.",
+          "why": "'All the above-mentioned institutions are so-called centralized exchanges — being characterized by the settlement of a transaction between the buyer and the seller. It is the central place where the price is determined.'"
+        },
+        {
+          "q": "What's the most liquid and also the biggest financial market in the world?",
+          "a": "Forex market.",
+          "why": "'The currency market is the largest and most liquid financial market in the world.'"
+        },
+        {
+          "q": "What time does the Forex market open?",
+          "a": "It is open from 5 p.m. EST on Sunday until 4 p.m. EST on Friday.",
+          "why": "The lesson states '24 hours a day, 5 days a week' — this rules out 24/7 and weekends. The specific hours (5pm EST Sunday to 4pm EST Friday) match the standard forex market schedule."
+        },
+        {
+          "q": "Can traders act as market makers in the OTC market?",
+          "a": "Yes.",
+          "why": "'In the OTC market, traders act as market makers by stating the prices at which they buy and sell securities, currencies or other financial products.'"
+        }
+      ],
+
+      "trading_agent_insights": [
+        "Forex is 24/5 not 24/7 — agent must block trades on Saturday and Sunday (market closed).",
+        "Forex OTC = no central price — prices vary by broker; agent uses the broker's live feed, not a 'universal' price.",
+        "OTC less regulated = less protection for traders; prop firm rules (FTMO) compensate for this gap.",
+        "Forex volume $7.5T/day dwarfs stocks — liquidity is the reason EURUSD/GBPUSD spreads are tight and execution is reliable."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-09"
+    },
+
+    "cfd": {
+      "url": "https://academy.ftmo.com/lesson/cfd/",
+      "module": "Financial Markets",
+      "lesson_title": "CFD – Contracts For Difference",
+      "order": 5,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "cfd": "Contract for Difference — an agreement between buyer and seller obliging the seller to pay the buyer the difference between the asset's current value and its value at contract closure. If buyer went long and the difference is negative, the buyer pays the seller.",
+        "financial_derivative": "A financial instrument whose price is FULLY DEPENDENT on the price of the underlying asset. 'Derive' = derived from a particular asset.",
+        "underlying_asset": "The asset on which a derivative is based. Can be stock, index, commodity, currency pair, cryptocurrency, etc.",
+        "cfd_history": "First CFD created in 1990 (20th century) by London broker Smith New Court. First allowed to trade on London Stock Exchange via internet by company GNI at end of 1990.",
+        "swap": "Fee charged for holding a CFD position overnight. Size based on central bank interest rate differentials. Positive when long on currency with HIGHER interest rate; negative when short on currency with HIGHER interest rate. Typically charged at 10 PM British time (varies by broker).",
+        "cfd_no_standard_terms": "There are NO standard contract terms for CFDs globally — each provider can use its own terms. Lack of standardization and regulation is the main reason CFD trading is BANNED in the United States.",
+        "dma": "Direct Market Access — trading mechanism allowing direct access to market order books.",
+        "cfd_shorting": "CFDs allow you to SHORT stocks without needing to borrow shares first — a key advantage over traditional investing.",
+        "cfd_leverage": "CFDs are traded with leverage — you only need a fraction of the position value to open a trade (margin). Amplifies both profits AND losses.",
+        "cfd_vs_futures_dax": "DAX futures intraday margin ~€13,000 per contract (2018). Overnight margin exceeds €21,000. CFDs allow trading DAX with much smaller capital. Optimal CFD day trading markets: DAX, Nasdaq, gold."
+      },
+
+      "key_rules": [
+        "CFD price is FULLY DEPENDENT on the price of the underlying asset.",
+        "You NEVER physically own the underlying asset with CFDs.",
+        "First CFD: 1990 (20th century) — Smith New Court, London.",
+        "Overnight holding fee = SWAP (not commission, not tariff).",
+        "Swap is positive when LONG on the currency with the HIGHER interest rate.",
+        "Swap is negative when SHORT on the currency with the HIGHER interest rate.",
+        "Swap is typically charged at 10 PM British time.",
+        "CFDs have NO standard contract terms globally — each provider sets its own.",
+        "CFD trading is BANNED in the United States due to lack of regulation.",
+        "Available CFD markets: stocks, indices, commodities, currencies, bonds, cryptocurrencies.",
+        "CFDs allow shorting WITHOUT borrowing shares first.",
+        "DMA = Direct Market Access.",
+        "CFDs do NOT expire — can be held indefinitely (but swaps accumulate).",
+        "Optimal CFD day trading markets: DAX, Nasdaq, gold."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "If you are holding CFDs, what type of fee will you be charged?",
+          "a": "Swap (and potentially Commission — both are mentioned in the lesson).",
+          "why": "'The trader can be charged swaps for overnight holding.' Commission is also mentioned for trade execution. For HOLDING specifically, the answer is Swap.",
+          "multiple_select": true,
+          "confirmed_answers": ["Swap", "Commission"]
+        },
+        {
+          "q": "Choose available markets to trade through CFD.",
+          "a": "Commodity, Index, Stock — all three are correct.",
+          "why": "'The underlying asset can be a stock, index, commodity, currency pair, cryptocurrency, etc.' All three options listed are valid CFD markets.",
+          "multiple_select": true
+        },
+        {
+          "q": "Is it possible to physically hold CFDs?",
+          "a": "No.",
+          "why": "'CFDs are financial derivatives that allow us to speculate on the price development of the underlying asset WITHOUT THE NEED TO OWN the underlying asset.' You never physically hold anything."
+        },
+        {
+          "q": "Can you be charged for holding CFDs overnight?",
+          "a": "Yes.",
+          "why": "'The trader can be charged swaps for overnight holding.'"
+        },
+        {
+          "q": "Does the price of derivatives depend on the underlying asset?",
+          "a": "Yes.",
+          "why": "'The price of derivatives is FULLY DEPENDENT on the price of the underlying asset.'"
+        },
+        {
+          "q": "In which century was the first CFD created?",
+          "a": "In the 20th century.",
+          "why": "'For CFDs, it is 1990 when the first derivative was created by the famous London broker Smith New Court.' 1990 = 20th century."
+        },
+        {
+          "q": "True or False? In general, CFDs have standard contract terms globally.",
+          "a": "FALSE.",
+          "why": "'The main con is that there are no standard contract terms for CFDs, each provider can use its own.'"
+        },
+        {
+          "q": "What does DMA stand for?",
+          "a": "Direct Market Access.",
+          "why": "DMA = Direct Market Access — standard financial term for direct order book access."
+        },
+        {
+          "q": "True/False. You cannot benefit from 'shorting' stocks thanks to CFD contracts.",
+          "a": "FALSE.",
+          "why": "'Most stock CFDs can also be shorted, and you don't need to borrow stocks as you normally would for traditional investments.' You CAN short with CFDs — so the statement is false."
+        }
+      ],
+
+      "trading_agent_insights": [
+        "FTMO accounts are CFD accounts — all agent rules apply to CFD mechanics (leverage, margin, swaps).",
+        "Swap costs accumulate on overnight positions — agent should factor swap into trade planning, especially for swing trades.",
+        "CFDs have no expiry — positions can be held indefinitely but swap eats into profit on long holds.",
+        "CFD shorting requires no share borrowing — agent can execute short signals immediately without pre-borrow checks."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-09"
+    },
+
+    "what-is-forex-and-how-it-differs-from-other-markets": {
+      "url": "https://academy.ftmo.com/lesson/what-is-forex-and-how-it-differs-from-other-markets/",
+      "module": "Forex",
+      "lesson_title": "What is Forex and how it differs from other markets",
+      "order": 6,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "forex_definition": "FOReign EXchange — decentralized global OTC market where all world currencies trade. Open 24h/day, 5 days/week. Daily volume: over $6.6 trillion (2019 data used in this lesson).",
+        "forex_vs_stocks_volume": "Forex daily volume $6.6 trillion vs US stock market ~$480 billion USD daily. Forex is ~13x larger.",
+        "retail_traders_share": "Retail traders make up only around 2-3% of total daily forex volume.",
+        "biggest_players": "Banks and large institutions. Also: Central Banks, Hedge Funds. Due to $6.6T volume, even large banks cannot easily manipulate prices.",
+        "eurusd": "Most traded currency pair in the world. EUR = base currency, USD = quoted currency. If price = 1.12, one euro = $1.12 USD.",
+        "forex_majors_and_crosses": "28 majors and crosses in forex. Brokers also offer exotics and CFDs — total pairs are more than 50.",
+        "holding_duration": "Trades can be closed within minutes of opening but can also be held for MONTHS.",
+        "forex_advantages_vs_stocks": [
+          "Lower fees — brokers profit from spreads, very low commissions",
+          "24h/5d trading vs stocks limited to exchange hours",
+          "Immediate execution — filled at prices you see",
+          "No Uptick Rule (existed 1938–2007 in stocks, required short sales at higher price than previous trade)",
+          "Harder to manipulate due to massive volume",
+          "Fewer products to focus on (28 majors vs thousands of stocks)"
+        ],
+        "forex_advantages_vs_futures": [
+          "Higher liquidity",
+          "24-hour trading",
+          "Low fees",
+          "No expiration (futures expire, forex/CFDs do not)",
+          "Over $6.6 trillion daily volume",
+          "Can participate in S&P 500, crude oil, gold through CFDs"
+        ],
+        "futures_advantage_over_forex": "Transparency — futures are centralized, giving access to REAL trading volume data not available in forex.",
+        "uptick_rule": "From 1938 to 2007, required short sales in stocks to be conducted at a HIGHER price than the previous trade. Does not apply to forex.",
+        "minimum_account": "Forex broker account can be opened with as little as $100. Futures too, but futures have bigger margin requirements."
+      },
+
+      "key_rules": [
+        "Forex is DECENTRALIZED and OTC — not centralized.",
+        "Forex daily volume: over $6.6 trillion (2019). NOT $7.5 trillion — this lesson uses 2019 data.",
+        "Retail traders = only 2-3% of daily forex volume.",
+        "Biggest players: Banks + large institutions (Central Banks, Hedge Funds).",
+        "EURUSD = most traded currency pair in the world.",
+        "28 majors and crosses in forex. With exotics = more than 50 total.",
+        "Forex trades can be held for months.",
+        "Futures have an advantage over forex: REAL volume data (centralized = transparent).",
+        "Uptick Rule (1938-2007): short stocks only at higher price than last trade — does NOT apply to forex.",
+        "Forex minimum account: $100. Futures: $100 but bigger margin requirements."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "True or False? Forex is a centralized market.",
+          "a": "FALSE.",
+          "why": "'Forex is a decentralized global market' and 'It is an over-the-counter (OTC) market, which means that there is not one centralized place. In other words, forex is a decentralized market.'"
+        },
+        {
+          "q": "What does the word Forex mean?",
+          "a": "Foreign exchange.",
+          "why": "'Forex, short for FOReign EXchange.' Exact FTMO definition."
+        },
+        {
+          "q": "How many currency pairs exist in Forex?",
+          "a": "More than 50.",
+          "why": "'We have 28 majors and crosses in forex. Of course, forex brokers offer exotics and CFDs.' With exotics included, total pairs exceed 50. The 28 figure covers only majors and crosses."
+        },
+        {
+          "q": "Who is among the biggest players in the forex market?",
+          "a": "Central Banks and Hedge Funds (multiple select — NOT retail traders, NOT local banks).",
+          "why": "'Banks and large institutions are the big players in the forex game. Retail traders make up only around 2-3% of that daily volume.' Central banks and hedge funds are the dominant large institutions.",
+          "multiple_select": true,
+          "confirmed_answers": ["Central Banks", "Hedge funds"]
+        },
+        {
+          "q": "Is it possible to hold Forex pairs through CFDs for months?",
+          "a": "Yes.",
+          "why": "'Trades can be closed within minutes of opening, but can also be held for months.' CFDs do not expire."
+        }
+      ],
+
+      "trading_agent_insights": [
+        "Retail traders = 2-3% of volume — we trade in a market dominated by banks and institutions; agent must avoid fighting the flow of large players.",
+        "Forex harder to manipulate than stocks — macro trend analysis is more reliable than in penny stocks; confirms agent's D1 trend-following approach.",
+        "28 majors and crosses is all we need — agent correctly focuses on EURUSD, GBPUSD, XAUUSD instead of chasing exotic pairs.",
+        "Futures have real volume data; forex doesn't — agent cannot rely on volume indicators, must use price action and structure instead."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-09"
+    },
+
+    "forex-market-structure-and-participants": {
+      "url": "https://academy.ftmo.com/lesson/forex-market-structure-and-participants/",
+      "module": "Forex",
+      "lesson_title": "Forex Market Structure and Participants",
+      "order": 7,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "otc_advantage": "OTC market is NOT controlled by any individual or group of people. Example: NYSE could shut down one day — this CANNOT happen in forex.",
+        "otc_disadvantage": "Forex market is LESS TRANSPARENT — cannot see the volume or depth of the market.",
+        "a_book_broker": "Uses ECN (Electronic Communication Network) or STP (Straight-Through Processing) to give clients DIRECT ACCESS to the market. Orders passed to the liquidity source. More likely to give SLIPPAGE (order books thin during news). Does NOT act as counterparty.",
+        "b_book_broker": "Operates as a MARKET MAKER. Orders processed IN-HOUSE — not visible outside broker's platform. No external liquidity pool. Acts as COUNTERPARTY to clients' trades (wins when client loses). Fills orders IMMEDIATELY with no slippage.",
+        "ecn": "Electronic Communication Network — used by A-book brokers to give direct market access.",
+        "stp": "Straight-Through Processing — used by A-book brokers alongside ECN for direct market access.",
+        "national_central_banks": "Determine exchange rates based on supply and demand. Form the INTERBANK MARKET. Make bid/ask spread, take huge transaction volumes. Conduct MONETARY POLICY. Examples: Deutsche Bank, JPMorgan, Citi, HSBC, Bank of America, Goldman Sachs.",
+        "investment_companies_hedge_funds": "Big players that diversify capital and use forex for international currency exchange payments. Can freely enter the forex market.",
+        "corporations_commercial": "Import/export businesses that exchange currencies for international payments. Example: Tesla buying parts in Switzerland must convert USD to CHF.",
+        "speculators_investors": "Buy/sell currencies to profit from future exchange rate changes. Large speculators = smaller hedge funds or prop trading companies. Small speculators = retail traders (2-3% of volume).",
+        "carry_trade": "Popular strategy for larger speculators — using a currency with LOWER interest rate to buy a currency with HIGHER interest rate.",
+        "position_trader": "Can enter the forex market — trades held for extended periods (weeks to months). Forex accommodates all trading styles."
+      },
+
+      "key_rules": [
+        "OTC main advantage: NOT controlled by any individual or group.",
+        "OTC main disadvantage: CANNOT see volume or depth of market (less transparent).",
+        "A-book = ECN/STP = direct market access = slippage possible during news = does NOT act as counterparty.",
+        "B-book = market maker = in-house processing = acts as COUNTERPARTY = immediate fill, no slippage.",
+        "STP = Straight-Through Processing.",
+        "ECN = Electronic Communication Network.",
+        "Central/National banks: determine exchange rates + conduct monetary policy + form interbank market.",
+        "Large participants (banks, institutions) mostly use forex for HEDGING, not speculation.",
+        "Retail traders = only 2-3% of $6.6 trillion daily volume.",
+        "Carry trade = borrow low-interest currency to buy high-interest currency.",
+        "A-book brokers give MORE slippage; B-book brokers fill immediately.",
+        "Investment companies and hedge funds CAN enter forex market.",
+        "Position traders CAN enter forex market."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "What intentions do National & Central banks have?",
+          "a": "They conduct monetary policy.",
+          "why": "Central banks determine exchange rates and form the interbank market. Conducting monetary policy is their defining role. 'C-book broker' doesn't exist. 'Support private banks' is not mentioned in the lesson."
+        },
+        {
+          "q": "Is the volume or depth of the Forex market transparent?",
+          "a": "No, it's not transparent.",
+          "why": "'The forex market is less transparent as we cannot see the volume or depth of the market.'"
+        },
+        {
+          "q": "One of the main advantages of trading on OTC is that it... (Complete sentence)",
+          "a": "is not controlled by individuals or people.",
+          "why": "'One of the main advantages of trading in the OTC market is that it is not controlled by any individual or group of people.'"
+        },
+        {
+          "q": "Is it correct that A-book brokers act as counterparties to their clients' trades?",
+          "a": "No.",
+          "why": "It is B-book brokers that 'act as a counterparty to their clients' trade.' A-book brokers pass trades to the liquidity source — they never take the other side."
+        },
+        {
+          "q": "What statement is true about an A-book broker?",
+          "a": "Uses electronic communication networks that give their clients access to the market.",
+          "why": "'A-book brokers use an ECN or STP that gives their clients direct access to the market as trades are passed right to the liquidity source.'"
+        },
+        {
+          "q": "Can investment companies and hedge funds enter the FOREX market?",
+          "a": "Yes.",
+          "why": "'Investment companies and hedge funds are also one of the big players in the forex market.'"
+        },
+        {
+          "q": "What does STP mean?",
+          "a": "Straight-Through Processing.",
+          "why": "Exact FTMO lesson text: 'straight-through processing (STP).' The other options (Spanning Tree Protocol, Shielded Twisted Pair) are networking/hardware terms unrelated to forex."
+        },
+        {
+          "q": "Can a position trader enter the FOREX market?",
+          "a": "Yes.",
+          "why": "The lesson states trades 'can also be held for months' and speculators of all sizes participate. Position trading (long-term holding) is a valid forex approach."
+        },
+        {
+          "q": "Which broker will more likely give you slippage?",
+          "a": "A-book broker.",
+          "why": "'A-book brokers will more likely give us slippage because they send orders to the real market, where order books are very thin during news releases.'"
+        },
+        {
+          "q": "What statement is true about a B-book broker?",
+          "a": "Becomes the counterparty of the trade + is a market making broker (select both).",
+          "why": "'B-book brokers operate as market makers' AND 'brokers often act as a counterparty to their clients' trade.' Both statements are explicitly true per the lesson.",
+          "multiple_select": true,
+          "confirmed_answers": ["becomes the counterparty of the trade", "is a market making broker"]
+        }
+      ],
+
+      "trading_agent_insights": [
+        "FTMO is an A-book or hybrid broker — agent should expect occasional slippage during high-impact news, not treat it as a malfunction.",
+        "B-book fills immediately with no slippage — if fills are suspiciously perfect, the broker may be B-book (internalized).",
+        "Large players use forex for HEDGING, not speculation — institutional flows can't be predicted the same way as retail speculation.",
+        "Carry trade uses interest rate differentials — agent must track central bank rate decisions as they move currency pairs fundamentally."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-09"
+    },
+
+    "what-is-traded-in-forex-currencies-and-correlations": {
+      "url": "https://academy.ftmo.com/lesson/what-is-traded-in-forex-currencies-and-correlations/",
+      "module": "Forex",
+      "lesson_title": "What is traded in Forex? Currencies and Correlations",
+      "order": 8,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "pair_structure": "Base currency / Quote currency. The exchange rate = units of QUOTE needed to buy 1 unit of BASE. Example: EURUSD at 1.3 means 1 EUR = 1.3 USD.",
+        "usd_dominance": "The US dollar makes MORE THAN 80% of all trades in the forex market. NOT 75% — that figure is wrong.",
+        "three_categories": "Majors, Minors/Crosses, Exotics.",
+        "majors": "Most traded and liquid pairs. ALL paired with the US dollar. There are 7 majors.",
+        "minors_crosses": "Pairs not quoted against the US dollar — against each other. Usually LESS LIQUID than majors. Example: EURGBP, AUDJPY, NZDCHF.",
+        "exotics": "Currencies from all over the world (Polish zloty, Hungarian forint, etc.). LESS LIQUID than crosses. More suitable for longer-term positions than day trading.",
+        "seven_majors_and_nicknames": {
+          "EURUSD": "Fiber — named from cotton fiber used in euro banknotes",
+          "GBPUSD": "Cable — named from the Atlantic cable transmitting exchange rates in the 19th century",
+          "AUDUSD": "Aussie",
+          "NZDUSD": "Kiwi",
+          "USDCAD": "Loonie — from the loon bird on the Canadian dollar coin",
+          "USDCHF": "Swissy",
+          "USDJPY": "Ninja"
+        },
+        "most_liquid_pair": "EURUSD — most liquid and traded. Second most traded: USDJPY.",
+        "usd_first_pairs": "USDCAD, USDCHF, USDJPY — these are MAJORS (not exotics). USD is base currency.",
+        "correlations": {
+          "CAD_and_crude_oil": "POSITIVE — Canada is major oil producer/exporter. Oil up → CAD strengthens → USDCAD goes DOWN (negative correlation between oil and USDCAD).",
+          "AUD_and_gold": "POSITIVE — Australia is major gold producer/exporter.",
+          "gold_and_JPY": "POSITIVE — both are safe haven assets in times of uncertainty.",
+          "gold_and_USD": "NEGATIVE — when USD weakens (inflation), investors buy gold as alternative store of value.",
+          "EURUSD_and_GBPUSD": "Highly correlated — both inversely correlated to USD. Long EURUSD + Long GBPUSD = double exposure to USD weakness."
+        }
+      },
+
+      "key_rules": [
+        "EURUSD = most liquid and traded pair. Nickname: Fiber.",
+        "USDJPY = second most traded pair. Nickname: Ninja.",
+        "GBPUSD nickname = Cable (Atlantic cable, 19th century).",
+        "USDCAD nickname = Loonie (loon bird on Canadian coin).",
+        "AUDUSD nickname = Aussie. NZDUSD = Kiwi. USDCHF = Swissy.",
+        "USD makes MORE THAN 80% of all forex trades — NOT 75%.",
+        "7 majors: EURUSD, GBPUSD, AUDUSD, NZDUSD, USDCAD, USDCHF, USDJPY.",
+        "Exotics are LESS LIQUID than crosses (not more).",
+        "Oil up → CAD up → USDCAD DOWN = negative correlation between oil and USDCAD.",
+        "AUD and gold: positive correlation.",
+        "Gold and JPY: both safe havens, positive correlation.",
+        "Gold and USD: negative correlation.",
+        "Trading correlated pairs simultaneously multiplies risk — avoid over-exposure.",
+        "Forex pair written with 1 slash: EUR/USD.",
+        "USD-first pairs (USDCAD, USDCHF, USDJPY) are MAJORS, NOT exotics."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "What is the most liquid currency pair?",
+          "a": "EUR/USD (Fiber).",
+          "why": "'EURUSD is the most liquid and traded currency.'"
+        },
+        {
+          "q": "What is the nickname for the EUR/USD currency pair?",
+          "a": "Fiber.",
+          "why": "'The most traded currency pair is EURUSD, nicknamed Fiber.' Named from the cotton fiber used in euro banknotes."
+        },
+        {
+          "q": "What is the base currency in the EUR/GBP currency pair?",
+          "a": "EUR.",
+          "why": "First currency in any pair = base currency. EUR/GBP → EUR is base, GBP is quote."
+        },
+        {
+          "q": "Which currency pairs are less liquid?",
+          "a": "Minors/Crosses AND Exotics (both — multi-select).",
+          "why": "'Minors/crosses are usually less liquid [than majors]' and 'Exotics are usually less liquid than crosses.' Both are less liquid than Majors.",
+          "multiple_select": true,
+          "confirmed_answers": ["Minors/Crosses", "Exotics"]
+        },
+        {
+          "q": "The US Dollar makes 75% of all foreign exchange transactions. Is that correct?",
+          "a": "No.",
+          "why": "'The US dollar makes MORE THAN 80% of all trades in the forex market.' 75% is incorrect."
+        },
+        {
+          "q": "How many slashes do we need to use to separate a Forex pair?",
+          "a": "1.",
+          "why": "A forex pair is written as EUR/USD — one slash separates the base and quote currency."
+        },
+        {
+          "q": "What are the two parts of the currency pair generally referred to as?",
+          "a": "Base and quote.",
+          "why": "'The euro is called the base currency, and the dollar is the quote currency.'"
+        },
+        {
+          "q": "If the EURUSD currency pair is at 0.9, what does it mean?",
+          "a": "1 EUR equals 0.9 USD.",
+          "why": "'EURUSD trading at 1.3 means we need 1.3 US dollars to buy 1 euro.' At 0.9 → 1 EUR = 0.9 USD."
+        },
+        {
+          "q": "Currency pairs with the US dollar as the base currency are called Exotic currency pairs.",
+          "a": "No.",
+          "why": "USD-first pairs (USDCAD, USDCHF, USDJPY) are MAJORS — the most traded and liquid pairs. Exotics are emerging market currencies like Polish zloty, Hungarian forint, etc."
+        },
+        {
+          "q": "Is there a negative correlation between Crude oil and USD/CAD?",
+          "a": "Yes.",
+          "why": "'An increase in oil prices usually means an increase in the Canadian dollar value. When oil prices go up, the USDCAD goes down.' Oil up → USDCAD down = NEGATIVE correlation between crude oil and USDCAD."
+        }
+      ],
+
+      "trading_agent_insights": [
+        "Agent trades EURUSD, GBPUSD, XAUUSD — lesson confirms these are highly correlated to USD. Never go long EURUSD + long GBPUSD simultaneously — that is double USD short exposure.",
+        "Gold (XAUUSD) has negative correlation with USD — when USD strengthens, gold typically falls. Agent must factor USD index direction before gold trades.",
+        "Exotics are illiquid and unsuitable for day trading — agent correctly excludes them from its pair universe.",
+        "USDCAD moves inversely to oil — agent can use oil price direction as a filter for CAD pair trades."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-09"
+    },
+
+    "forex-trading-hours-and-sessions": {
+      "url": "https://academy.ftmo.com/lesson/forex-trading-hours-and-sessions/",
+      "module": "Forex",
+      "lesson_title": "Forex Trading Hours and Sessions",
+      "order": 9,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "market_hours": "24 hours a day, 5 days a week. Closed on weekends (2 days/week). Opens Sunday 9 PM GMT, closes Friday ~9 PM GMT.",
+        "all_times_gmt_london": "All session times referenced in GMT+0 (London time).",
+        "session_schedule_gmt": {
+          "sydney_open": "Sunday 9 PM GMT",
+          "tokyo_open": "Sunday 11 PM GMT",
+          "asian_session": "9 PM – 8 AM GMT (Sydney + Tokyo merged)",
+          "frankfurt_open": "7 AM GMT",
+          "london_open": "8 AM GMT",
+          "european_session": "7 AM – 4 PM GMT (Frankfurt + London merged)",
+          "north_american_open": "12 PM GMT",
+          "overlap": "12 PM – 4 PM GMT (European/North American overlap)",
+          "london_close": "4 PM GMT",
+          "new_york_close": "9 PM GMT"
+        },
+        "asian_session": "LOWEST volume of the three sessions (~20% of daily volume). Controlled by Japanese economy (3rd largest globally). Japanese yen = 3rd most traded currency (~20% of all transactions). Best pairs: AUDJPY, AUDNZD, NZDJPY.",
+        "european_session": "Over 30% of total forex volume. First high-liquidity session of the day — many NEW TRENDS form at London open. Low spreads — optimal for scalpers and day traders. Best crosses: EURGBP, GBPJPY.",
+        "north_american_session": "Last trading session of the day. Over 80% of traded volume involves USD. Key events: NFP (Non-Farm Payrolls), FOMC (Federal Open Market Committee), unemployment rates, CPI (Consumer Price Index). Slows at London close 4 PM.",
+        "overlap": "12 PM – 4 PM GMT. European/North American overlap = HIGHEST volume period = MOST trading opportunities.",
+        "best_trading_days": "Tuesday, Wednesday, Thursday. Monday morning slow until NY session. Friday has lower volumes (NFP on first Friday = exception).",
+        "european_can_trade_asian": "Yes — European traders who like to trade during the night can trade the Asian session.",
+        "cfd_hours": {
+          "european_indices_dax_stoxx": "Open 1 AM – 10 PM London time.",
+          "us_indices_sp500_nasdaq_dow": "Trade 23 hours/day, break 10 PM – 11 PM. Pit session: 2:30 PM until market close.",
+          "commodities_oil_gold": "Trade 23 hours/day, highest volume during North American session."
+        }
+      },
+
+      "key_rules": [
+        "Forex closed 2 days a week (Saturday and Sunday) — NOT 7 days, NOT 5 days.",
+        "Asian session has LOWEST volume of the three sessions.",
+        "European/North American overlap (12–4 PM GMT) = HIGHEST volume = MOST opportunities.",
+        "North American session = LAST trading session of the day.",
+        "Best days: Tuesday, Wednesday, Thursday.",
+        "Tuesday typically has double the volatility of Monday.",
+        "European traders CAN trade the Asian session (night trading).",
+        "DAX and Stoxx = EUROPEAN indices (not American, not Asian).",
+        "US indices trade 23 hours/day. European indices: 1 AM – 10 PM London time.",
+        "Gold and crude oil: 23 hours/day, highest volume in North American session.",
+        "NFP = Non-Farm Payrolls (North American session, first Friday of month).",
+        "FOMC = Federal Open Market Committee.",
+        "CPI = Consumer Price Index.",
+        "Asian session: Japanese yen = 3rd most traded currency (~20% of all transactions).",
+        "London session: over 30% of total forex volume."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "Is it possible to trade the Asian sessions during the FTMO Challenge?",
+          "a": "Yes.",
+          "why": "No restriction on session trading exists in FTMO rules. The lesson states traders 'can trade at any time of the day that suits them' and explicitly mentions European traders trading the Asian session."
+        },
+        {
+          "q": "Which of these sessions brings the lowest volume?",
+          "a": "Asian session.",
+          "why": "'The Asian session has the lowest volume of the three trading sessions.'"
+        },
+        {
+          "q": "What is typical for the 'London/New York overlap'?",
+          "a": "It usually brings a lot of trading opportunities.",
+          "why": "'This is called the European/North American overlap, and it usually brings a lot of trading opportunities as there is the highest volume traded during those hours.'"
+        },
+        {
+          "q": "What is the last trading session of the day based on London time/GMT?",
+          "a": "New York (North American session).",
+          "why": "'The North American session is the last trading session for the given day.' It runs until 9 PM GMT."
+        },
+        {
+          "q": "Which days generally provide highest volume?",
+          "a": "Tuesday, Wednesday and Thursday.",
+          "why": "'Tuesday usually offers double the volatility of Monday, and it makes it one of the best days to trade during the week, with Wednesday and Thursday.'"
+        },
+        {
+          "q": "As a European, can you trade the Asian session?",
+          "a": "Yes.",
+          "why": "'This trading session can also attract European traders who like to trade during the night.' No geographical restriction."
+        },
+        {
+          "q": "DAX40 and Stoxx600 are … indices?",
+          "a": "European.",
+          "why": "'European indices such as DAX or Stoxx open at 1 AM and trade until 10 PM London time.'"
+        },
+        {
+          "q": "How often is the Forex market generally closed?",
+          "a": "2 days a week.",
+          "why": "'The forex market will always be open. Just not at weekends.' Weekends = 2 days (Saturday + Sunday)."
+        }
+      ],
+
+      "trading_agent_insights": [
+        "CONFIRMED: London (8 AM–4 PM GMT) and New York (12–9 PM GMT) are the agent's active windows — FTMO Academy endorses this exact approach.",
+        "Overlap 12–4 PM GMT = highest volume = agent's primary trading window for quality setups.",
+        "Asian session = lowest volume — agent correctly avoids it ('Asian session — low liquidity, patterns fail to follow through').",
+        "Best days Tuesday–Thursday — agent should be most active mid-week; cautious Monday morning and Friday afternoon.",
+        "NFP first Friday of month = extreme volatility — agent must block all trades 30 min before and after.",
+        "Gold trades 23h/day, highest volume in NY session — confirms XAUUSD entry timing should focus on NY session overlap."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-10"
+    },
+
+    "instruments-traded-in-the-financial-markets": {
+      "url": "https://academy.ftmo.com/lesson/instruments-traded-in-the-financial-markets/",
+      "module": "Financial Markets",
+      "lesson_title": "Instruments traded in the Financial Markets",
+      "order": 10,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "stock": "A security where the owner becomes a SHAREHOLDER of the company. Rights include: dividends, voting at general meeting, participation in liquidation balance.",
+        "blue_chip": "Shares of the LARGEST and most PROFITABLE companies. Traded on stock exchange. Have STABLE GROWTH. Pay DIVIDENDS on a REGULAR BASIS. Implies large market cap and high liquidity.",
+        "paper_shares": "Physical document form of stock.",
+        "dematerialized_shares": "Electronic record form of stock — the modern standard.",
+        "currency_pair": "Two currencies where one is base and one is quote. Forex daily volume $7.5 trillion (2022). High liquidity and often high volatility. Price moves up to 1-2% daily.",
+        "eurusd_rate": "EURUSD at 1.12 means 1.12 USD needed to buy 1 EUR. The rate is always the unit of the BASE currency.",
+        "stock_index": "Sum of many different instruments traded on one exchange. Indicator of a given segment or economy. Generally STABLE and LESS VOLATILE than individual stocks.",
+        "dax": "Frankfurt Stock Exchange index. Composed of 40 most important German companies: BMW, Adidas, BASF, Bayer, Lufthansa, Siemens.",
+        "commodities": "Goods traded in markets WITHOUT quality differences — deliverable from different suppliers are mutually substitutable. Examples: crude oil, gold, natural gas, coffee, corn, orange juice.",
+        "commodity_price_factors": "Climate change, global resource outages, trade wars, world affairs, macroeconomic data, population growth demands.",
+        "commodity_currency_correlations": {
+          "crude_oil": "Canada (CAD)",
+          "gold_iron_ore": "Australia (AUD)",
+          "dairy_products": "New Zealand (NZD)",
+          "natural_gas": "Qatar (QAR)"
+        },
+        "cryptocurrency": "Digital/electronic currency. NOT REGULATED. HIGH VOLATILITY. Examples: Bitcoin, Ethereum, Dash, Ripple, Litecoin. Bitcoin 2021 range: $29,000–$64,000.",
+        "equity_index_volatility": "Indices are LESS VOLATILE than individual stocks. They are a stable investment instrument."
+      },
+
+      "key_rules": [
+        "Blue chip = largest + most profitable + stable growth + regular dividends + large market cap + high liquidity.",
+        "Equity indices are LESS volatile than individual stocks — they are stable instruments.",
+        "S&P 500 is LESS volatile than individual stocks — NOT more volatile.",
+        "Commodity prices affected by: climate change, global resource outages, trade wars, world affairs.",
+        "Civil wars are NOT explicitly listed as a commodity price factor in this lesson.",
+        "Stock owner = SHAREHOLDER (not bondholder, not futuresholder).",
+        "Forex = high liquidity AND often high volatility.",
+        "Cryptocurrencies = NOT regulated + HIGH volatility (NOT low volatility).",
+        "Stocks can be traded on stock exchanges AND through CFDs.",
+        "Commodities can be traded through CFDs.",
+        "Equity indices CAN be traded through futures.",
+        "DAX 40 = Frankfurt Stock Exchange, 40 German companies (BMW, Adidas, BASF, Bayer, Lufthansa, Siemens).",
+        "NZD/USD → NZD is base currency (first), USD is quote currency (second).",
+        "Stocks traded on: stock exchanges (NYSE, NASDAQ, Euronext, etc.) AND OTC markets (via CFDs).",
+        "FTMO is NOT a stock exchange — it is a prop trading firm."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "What's typical for blue chip stocks?",
+          "a": "Large market cap + Stable growth + Regular payments via dividends (select all three).",
+          "why": "'These are the shares of the largest and most profitable companies, being traded on the stock market exchange, having stable growth, and paying dividends on a regular basis.' Large market cap is implied by 'largest companies'. NOT low trading volume or low liquidity.",
+          "multiple_select": true,
+          "confirmed_answers": ["Large market cap", "Stable growth", "Regular payments via dividends"]
+        },
+        {
+          "q": "Would you consider the equity index S&P 500 more volatile than individual stocks?",
+          "a": "No.",
+          "why": "'Indices are a stable investment instrument. As a rule, they are not volatile just as any individual stock titles can be.' Indices are LESS volatile than individual stocks."
+        },
+        {
+          "q": "Name some factors which impact the price of commodities.",
+          "a": "Trade wars + Outages + Lack of global resources + Climate change (select these four — NOT civil wars).",
+          "why": "'Their price depends on climate change, global resource outages, trade wars, etc.' Civil wars are not explicitly listed. 'Lack of global resources' = equivalent to 'global resource outages'.",
+          "multiple_select": true,
+          "confirmed_answers": ["Trade wars", "Outages", "Lack of global resources", "Climate change"]
+        },
+        {
+          "q": "How would you refer to somebody who owns stocks?",
+          "a": "Shareholder.",
+          "why": "'A stock is a security that the owner becomes a shareholder of the company.'"
+        },
+        {
+          "q": "Is it true that Forex is characterised by high liquidity?",
+          "a": "Yes.",
+          "why": "'Currency pairs are characterized by high liquidity and often volatility too.'"
+        },
+        {
+          "q": "Is this statement true or false: Cryptocurrencies are not regulated and have low volatility.",
+          "a": "FALSE.",
+          "why": "The 'not regulated' part is correct. But 'low volatility' is WRONG — 'The price changes of cryptos are very steep — Bitcoin in 2021 ranged from $29,000 to $64,000.' Crypto has HIGH volatility."
+        },
+        {
+          "q": "Can you trade commodities through CFDs?",
+          "a": "Yes.",
+          "why": "The lesson states stocks can be traded through CFDs, and the CFD lesson explicitly states CFDs cover 'commodities' as an underlying asset type."
+        },
+        {
+          "q": "In the NZD/USD currency pair, which one is the base currency?",
+          "a": "New Zealand Dollar.",
+          "why": "First currency in any pair = base currency. NZD/USD → NZD is base."
+        },
+        {
+          "q": "Where can you trade stocks or stock derivatives?",
+          "a": "EURONEXT + NASDAQ + OTC Market (select three — NOT FTMO).",
+          "why": "'Stocks can be traded on stock exchanges but also through CFDs.' EURONEXT and NASDAQ are stock exchanges. OTC = CFD trading. FTMO is a prop trading firm, not an exchange.",
+          "multiple_select": true,
+          "confirmed_answers": ["EURONEXT", "NASDAQ", "OTC Market (over the counter)"]
+        },
+        {
+          "q": "Can you trade equity indices through futures?",
+          "a": "Yes.",
+          "why": "From the CFD lesson: 'if we are interested in trading popular futures products such as S&P 500... we can still participate in those markets through CFDs.' The DAX futures example confirms indices trade on futures markets."
+        },
+        {
+          "q": "Which equity index consists of BMW, Adidas, Bayer, Lufthansa, Siemens?",
+          "a": "DAX 40.",
+          "why": "'The most famous stock index of the Frankfurt Stock Exchange – DAX, is composed of a share price by 40 most important selected German companies. (BMW, Adidas, BASF, Bayer, Lufthansa, Siemens).'"
+        }
+      ],
+
+      "trading_agent_insights": [
+        "Gold (XAUUSD) correlates with AUD — when gold rises, AUD typically strengthens; agent can use XAUUSD direction as AUD bias filter.",
+        "NZD correlates with dairy products — NZD/USD can spike on dairy auction results; agent should treat major dairy data as CAUTION event.",
+        "CAD correlates with crude oil — already in CORRELATED_PAIRS; confirmed by this lesson.",
+        "Crypto = HIGH volatility + unregulated — agent should avoid BTC/ETH trades during challenge phases due to unpredictable gap risk.",
+        "Blue chip stocks (via CFDs) are more liquid and predictable than small caps — if ever adding stock CFDs, blue chips only."
+      ],
+      "status": "certified",
+      "certified": true,
+      "certification_date": "2026-05-10"
+    },
+
+    "trading-terminology": {
+      "url": "https://academy.ftmo.com/lesson/trading-terminology/",
+      "module": "Financial Markets",
+      "lesson_title": "Trading Terminology",
+      "order": 11,
+      "status": "read",
+      "certified": false,
+      "certification_date": null,
+
+      "key_concepts": {
+        "lot_sizes": {
+          "standard": "1 lot = 100,000 units. 1 pip on EURUSD = $10.",
+          "mini": "0.1 lot = 10,000 units.",
+          "micro": "0.01 lot = 1,000 units.",
+          "nano": "0.001 lot = 100 units."
+        },
+        "leverage": "Using a small amount of equity supplemented by substantially larger amounts of foreign capital. 1:500 leverage on $1,000 account = $500,000 max position. Trader earns/loses 500x the movement.",
+        "margin": "Required amount of funds needed to participate in the market. With 1:100 leverage, opening 1 lot EURUSD requires $1,000 margin.",
+        "hedging": "Creating a position in a particular market to minimize risk from another position. Tools: insurance contracts, forwards, swaps, options, OTC derivatives, futures contracts. Futures exchanges arose in the 18th century for hedging agricultural commodities.",
+        "pip": "Price Interest Point. Defined as 0.01% (percentage of one percent). For most pairs = 4th decimal place. For JPY pairs = 2nd decimal place. Example: EURUSD 1.11510 → 1.11520 = 1 pip difference.",
+        "bid": "Price of demand — the price for which the contract can be SOLD at a given moment.",
+        "ask": "Price of offer — the best price at which the contract can be PURCHASED. Retail trader always gets a less advantageous price.",
+        "spread": "Difference between supply (ask) and demand (bid). Also = difference between sell and buy price = difference between Bid and Ask = expense the trader must consider while trading.",
+        "trading_strategy": "Combination of financial objectives, acceptable risk level, instrument choice, entry/exit limits, SL/TP settings, and market direction analysis. Gives the trader an EDGE.",
+        "edge": "The advantage a trader has in their strategy. Without an edge, favourable trading results are unlikely.",
+        "volatility": "Indicates fluctuations in the value of an asset or its rate of return over a period of time. Expresses the risk of investing. When volatility = 0, no profit or loss is possible.",
+        "balance": "Shows only CLOSED positions P&L. Does NOT include open/floating positions.",
+        "equity": "Balance + floating (unrealized) P&L from open positions. Considers BOTH open and closed positions.",
+        "rrr": "Reward to Risk Ratio. Risk $100 to gain $300 = 3:1 RRR. With 2:1 RRR you only need 40% win rate to be profitable. Higher RRR = lower win rate needed.",
+        "scalper": "Holds positions for MINUTES (sometimes seconds). Fast in-and-out. Requires 100% focus during session. Lower win rate compensated by high frequency and good RRR.",
+        "day_trader": "Holds positions for a few HOURS. Watches market whole day. Tries to capture bigger intraday moves. Generally does not hold overnight.",
+        "swing_trader": "Holds positions for a couple of DAYS, sometimes WEEKS. Captures intra-week moves. Popular among beginners. Requires extreme patience.",
+        "position_trader": "Also called an INVESTOR. Holds positions for WEEKS, MONTHS, or YEARS. Follows large fundamental sentiments. Requires large capital.",
+        "trading_platform": "Software system to manage market positions. Provided by broker. Gives access to financial markets.",
+        "broker": "Legal entity providing access to capital markets. Generates profit from spreads and commissions. Provides trading platform, market analysis, and trade execution.",
+        "penny_stocks": "Small, highly volatile stocks — higher volatility than blue chips.",
+        "sessions": {
+          "asian": "Best pairs: AUDJPY. EURGBP doesn't make much sense in Asian session.",
+          "european_north_american": "Highest volume sessions — markets moving across the board."
+        }
+      },
+
+      "key_rules": [
+        "Hedging tools: forwards, swaps, options, futures contracts (all four are valid).",
+        "Stop Loss execution does NOT always mean a loss — if SL is trailed above entry, executing it locks in profit.",
+        "Balance = closed positions only. Equity = balance + open floating P&L.",
+        "With 2:1 RRR you only need 40% win rate to be profitable.",
+        "Profitable RRR/WR combination: 60% WR + 1.5 RRR (positive expected value).",
+        "Scalper = minutes (sometimes seconds). Day trader = hours. Swing trader = days/weeks. Position trader = months/years.",
+        "Position trader = also called an Investor.",
+        "Penny stocks have HIGHER volatility than blue chip stocks.",
+        "Going long = expectation that instrument will INCREASE in value.",
+        "Long/Short = speculation on FUTURE price movement.",
+        "Spread = difference between Bid and Ask = expense to consider when trading.",
+        "Volatility = fluctuations in value + risk of investing. When volatility = 0, no profit or loss possible.",
+        "Trading platform = software system to manage market positions.",
+        "Pip for JPY pairs = 2nd decimal place (not 4th)."
+      ],
+
+      "exam_qa": [
+        {
+          "q": "What are some of the tools you can use to hedge?",
+          "a": "Options + Swaps + Forwards + Futures (all four).",
+          "why": "'Some examples are insurance contracts, forwards, swaps, options, many different OTC derivatives, and arguably the most popular are futures contracts.'",
+          "multiple_select": true,
+          "confirmed_answers": ["Options", "Swaps", "Forwards", "Futures"]
+        },
+        {
+          "q": "Would you agree that once a stop loss order is executed, you always log a loss in your balance?",
+          "a": "No.",
+          "why": "If a Trailing Stop or moved SL is set above entry (for a long), executing it locks in a profit, not a loss. 'The Stop Loss can be adjusted to lock in profits by setting it at a price higher than the current market level.'"
+        },
+        {
+          "q": "Does balance consider open positions?",
+          "a": "No.",
+          "why": "Balance shows only closed/realized P&L. Equity = Balance + floating (unrealized) P&L from open positions."
+        },
+        {
+          "q": "What Win Rate and Reward Risk Ratio are relatively good for the long-term profitability?",
+          "a": "60% winrate, 1.5 RRR.",
+          "why": "Expected value: 0.6×1.5 - 0.4×1 = 0.5 (positive). All other options have negative expected value. The lesson confirms 'With 2:1 RRR, you only need 40% win rate to make money.'"
+        },
+        {
+          "q": "Does Equity consider only closed positions?",
+          "a": "No.",
+          "why": "Equity = Balance + floating P&L from open positions. It considers BOTH open and closed positions."
+        },
+        {
+          "q": "What statement is true about the scalper?",
+          "a": "Holds positions for minutes.",
+          "why": "'Scalpers are in and out of the markets very quickly; their trades last from minutes to sometimes just a few seconds.'"
+        },
+        {
+          "q": "Which stocks have higher volatility?",
+          "a": "Penny stocks.",
+          "why": "Blue chip stocks have 'stable growth' implying lower volatility. Penny stocks are small, thinly traded, and highly volatile — frequently subject to pump-and-dump schemes (mentioned in the Forex vs Stocks lesson)."
+        },
+        {
+          "q": "What does 'going long' mean?",
+          "a": "Expectation that an instrument will increase in value.",
+          "why": "Long = buy expecting price to rise. This is the core definition across all FTMO Academy lessons."
+        },
+        {
+          "q": "What is the general meaning of a Long or a Short position?",
+          "a": "Speculation on the future price movement.",
+          "why": "Both long and short positions are bets on what the price will do in the FUTURE — not past or present."
+        },
+        {
+          "q": "What is 'Spread'?",
+          "a": "Difference between supply and demand + Difference between sell price and buy price + Expense that a trader must take into account + Difference between Bid and Ask price (all four are correct).",
+          "why": "'The difference between supply (ask) and demand (bid) is called a spread... The spread is the expense that a trader must consider while trading.' All four definitions are stated or implied in the lesson.",
+          "multiple_select": true,
+          "confirmed_answers": ["Difference between supply and demand", "Difference between sell price and buy price", "Expense that a trader must take into account while trading", "Difference between Bid and Ask price"]
+        },
+        {
+          "q": "What statement is true about a swing trader?",
+          "a": "Holds positions for days or weeks.",
+          "why": "'Swing traders hold positions for a couple of days, sometimes weeks.' Not hours (day trader), not minutes (scalper), not months (position trader)."
+        },
+        {
+          "q": "What statement is true about the day trader?",
+          "a": "Holds positions for hours.",
+          "why": "'Day traders usually hold trades for a few hours.' Not minutes (scalper), not days/weeks (swing trader)."
+        },
+        {
+          "q": "What is a trading platform?",
+          "a": "Software system to manage market positions.",
+          "why": "'The broker provides its customers with the trading platform (software for access to financial markets).' It is software, not a social network or meeting place."
+        },
+        {
+          "q": "What statement is true about a position trader?",
+          "a": "Holds positions for months and more + is often called an Investor (both).",
+          "why": "'Position traders are also called investors. They hold their trades for weeks, months, or years.'",
+          "multiple_select": true,
+          "confirmed_answers": ["holds positions for months and more", "is often called an Investor"]
+        },
+        {
+          "q": "True or False? Volatility indicates fluctuations in the value of an asset or its rate of return over a period of time and the risk of investing in assets.",
+          "a": "TRUE.",
+          "why": "Exact FTMO lesson text: 'Volatility indicates the fluctuations in the value of an asset or its rate of return over a given period of time and expresses the risk of investing in an asset.'"
+        }
+      ],
+
+      "trading_agent_insights": [
+        "Agent operates as a swing trader (days/weeks) — confirmed by FTMO Academy as a valid approach requiring patience and overnight position management.",
+        "Penny stocks = high volatility traps — agent correctly excludes them; only blue chips if ever trading stock CFDs.",
+        "Balance vs Equity distinction is critical — agent monitors EQUITY (not balance) for drawdown calculations, since open positions affect real-time risk.",
+        "2:1 RRR minimum needs only 40% win rate to be profitable — agent's current 3/5 (60%) win rate with 2:1 RRR is highly profitable mathematically.",
+        "Trailing Stop can exit at profit — agent implements this correctly (trail SL to breakeven after 1:1 reached)."
+      ]
+    }
+  }
+}

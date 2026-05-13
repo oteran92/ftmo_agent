@@ -6,7 +6,7 @@
 
 set -e
 
-DROPLET_IP="165.22.25.204"
+DROPLET_IP="46.101.206.29"
 REPO_URL="https://github.com/oteran92/ftmo_agent"
 
 echo "=== FTMO Monitor — Droplet Setup ==="
@@ -97,6 +97,8 @@ run_remote "printf '%s\n' \
 'MS_REFRESH_TOKEN=${MS_REFRESH_TOKEN}' \
 'ALERT_EMAIL_FROM=${ALERT_EMAIL_FROM}' \
 'ALERT_EMAIL_TO=${ALERT_EMAIL_TO}' \
+'METAAPI_TOKEN=${METAAPI_TOKEN}' \
+'METAAPI_ACCOUNT_ID=${METAAPI_ACCOUNT_ID}' \
 > /opt/ftmo_agent/.env"
 echo "[OK] .env created on server"
 
