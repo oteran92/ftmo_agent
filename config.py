@@ -17,7 +17,7 @@ PHASES = {
 # ── Risk parameters ────────────────────────────────────────────────────────────
 DAILY_BUDGET_PCT        = 0.010   # 1.0% of account balance
 RISK_PER_TRADE_PCT      = 0.005   # 0.5% per trade
-MIN_RRR                 = 2.0     # Minimum reward:risk ratio
+MIN_RRR                 = 3.0     # Minimum reward:risk ratio (raised from 2.0 based on v3.0 backtest: RRR 1:3 is the best variant)
 HARD_STOP_LOSSES        = 2       # Consecutive losses before forced stop
 NEWS_BUFFER_MIN         = 30      # Minutes before/after high-impact news
 CRISIS_THRESHOLD_PCT    = 0.04    # 4% drawdown → Crisis Mode
@@ -109,10 +109,20 @@ PIP_SIZE: dict[str, float] = {
 }
 
 # ── Monitored pairs universe ────────────────────────────────────────────────────
+# v3.1 update — based on 5-year backtest (BACKTEST_v3.md):
+#   Removed: GBPUSD (E=-$1.38), EURJPY (E=-$2.22), AUDUSD (E=-$0.73), USDCAD (E=-$1.73)
+#   Kept:    XAUUSD (E=+$32.63 ✅), GBPJPY (E=+$3.90), USDCHF (E=+$2.59),
+#            USDJPY (E=+$1.19), EURUSD (E=+$0.29)
 MONITORED_PAIRS: list[str] = [
-    "EURUSD", "GBPUSD", "USDJPY", "XAUUSD",
-    "EURJPY", "GBPJPY", "AUDUSD", "USDCAD", "USDCHF",
+    "XAUUSD",   # best pair — E=$+32.63/trade, PF=1.38
+    "GBPJPY",   # strong — E=$+3.90/trade, PF=1.16
+    "USDCHF",   # solid  — E=$+2.59/trade, PF=1.14
+    "USDJPY",   # solid  — E=$+1.19/trade, PF=1.05
+    "EURUSD",   # core   — marginal positive, high liquidity
 ]
+
+# Pairs disabled after backtest (negative expectancy over 5 years):
+# GBPUSD: E=-$1.38, EURJPY: E=-$2.22, AUDUSD: E=-$0.73, USDCAD: E=-$1.73
 
 # ── Shared timezone (Central European Summer Time, UTC+2) ─────────────────────
 from datetime import timezone as _tz, timedelta as _td
