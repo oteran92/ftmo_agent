@@ -282,7 +282,7 @@ def _build_result(entry: dict, source: str) -> dict:
     }
 
 
-def refresh_all_currencies() -> dict[str, dict]:
+def _refresh_all_currencies() -> dict[str, dict]:
     """
     Force-refresh COT data for all tracked currencies.
     Should be called once per week (Saturday) to keep cache current.

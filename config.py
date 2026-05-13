@@ -90,3 +90,30 @@ CORRELATED_PAIRS: dict[str, list[str]] = {
 
 # ── Claude model ───────────────────────────────────────────────────────────────
 CLAUDE_MODEL = "claude-sonnet-4-6"
+
+# ── Pip values per standard lot (USD account) — no-slash keys, single source ───
+# JPY crosses calibrated to 2026 exchange rates (~155–213).
+# XAU: 100 oz/lot × $0.01/pip = $1/pip × 10 pips/point = $10.
+PIP_VALUES_USD: dict[str, float] = {
+    "EURUSD": 10.0, "GBPUSD": 10.0, "AUDUSD": 10.0, "NZDUSD": 10.0,
+    "USDCHF": 10.0, "USDCAD": 7.5,  "XAUUSD": 10.0,
+    "USDJPY": 6.5,  "EURJPY": 6.5,  "GBPJPY": 6.5,
+}
+
+# ── Pip size per symbol (price move = 1 pip) ────────────────────────────────────
+PIP_SIZE: dict[str, float] = {
+    "EURUSD": 0.0001, "GBPUSD": 0.0001, "AUDUSD": 0.0001, "NZDUSD": 0.0001,
+    "USDCHF": 0.0001, "USDCAD": 0.0001,
+    "USDJPY": 0.01,   "EURJPY": 0.01,   "GBPJPY": 0.01,
+    "XAUUSD": 0.1,
+}
+
+# ── Monitored pairs universe ────────────────────────────────────────────────────
+MONITORED_PAIRS: list[str] = [
+    "EURUSD", "GBPUSD", "USDJPY", "XAUUSD",
+    "EURJPY", "GBPJPY", "AUDUSD", "USDCAD", "USDCHF",
+]
+
+# ── Shared timezone (Central European Summer Time, UTC+2) ─────────────────────
+from datetime import timezone as _tz, timedelta as _td
+CEST = _tz(_td(hours=2))

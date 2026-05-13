@@ -20,14 +20,14 @@ from skills.news_filter     import fetch_upcoming_news, check_news_window
 from skills.end_of_day      import process_end_of_day
 from skills.crisis_mode     import activate_crisis_mode, crisis_status, check_and_trigger_crisis
 from skills.pattern_detector import analyze_patterns
-from mt5_connector import (
+from skills.metaapi_client import (
     live_account_summary,
     get_positions,
     get_price,
     send_order,
     close_position,
     modify_position,
-    is_bridge_connected,
+    is_connected as is_bridge_connected,
 )
 from skills.signal_engine import analyze_setup, scan_all_pairs
 

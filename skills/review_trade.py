@@ -157,7 +157,7 @@ def review_trade(
 
     if correlated:
         try:
-            from mt5_connector import get_positions
+            from skills.metaapi_client import get_positions
             open_positions = get_positions() or []
             open_symbols = {
                 p.get("symbol", "").replace("/", "").replace("-", "").replace("_", "").upper()

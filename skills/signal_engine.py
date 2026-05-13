@@ -177,8 +177,8 @@ def _is_bullish_engulfing(prev: dict, curr: dict) -> bool:
 def _is_bearish_engulfing(prev: dict, curr: dict) -> bool:
     """Prev is bullish, curr is bearish and engulfs prev body."""
     return (
-        curr["c"] > curr["o"] and       # prev bullish (note: prev = h4_prev)
-        prev["c"] < prev["o"] and       # curr bearish
+        prev["c"] > prev["o"] and       # prev bullish
+        curr["c"] < curr["o"] and       # curr bearish
         curr["o"] >= prev["c"] and
         curr["c"] <= prev["o"]
     )
@@ -395,8 +395,8 @@ def scan_all_pairs() -> list[dict]:
     Scan all monitored pairs via TwelveData — no MT5 required.
     Adds inter-pair delay to stay within free plan rate limit (8 req/min).
     """
-    pairs = ["EURUSD", "GBPUSD", "USDJPY", "XAUUSD",
-             "EURJPY", "GBPJPY", "AUDUSD", "USDCAD", "USDCHF"]
+    from config import MONITORED_PAIRS
+    pairs = MONITORED_PAIRS
     results = []
     for i, pair in enumerate(pairs):
         if i > 0:

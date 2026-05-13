@@ -2,7 +2,7 @@
 Trade Journal — autonomous post-trade analysis with Claude.
 
 After each trade closes, this module:
-  1. Detects new closed trades by comparing MT5 closed_trades.json with the known log
+  1. Detects new closed trades via MetaApi history API
   2. Calls Claude to analyze the trade: methodology, outcome, lessons learned
   3. Writes structured lessons to data/trade_lessons.json
 
@@ -14,30 +14,18 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 import anthropic
 
+from config import CEST
+
 BASE_DIR  = Path(__file__).parent.parent
 DATA_DIR  = BASE_DIR / "data"
-LESSONS_FILE   = DATA_DIR / "trade_lessons.json"
+LESSONS_FILE      = DATA_DIR / "trade_lessons.json"
 KNOWN_TRADES_FILE = DATA_DIR / "known_closed_trades.json"
-
-# MT5 closed trades file (written by FTMO_Bridge EA)
-_DEFAULT_MT5_FILES = (
-    Path.home()
-    / "Library/Application Support/net.metaquotes.wine.metatrader5"
-    / "drive_c/Program Files/MetaTrader 5/MQL5/Files"
-)
-
-CEST = timezone(timedelta(hours=2))
-
-
-def _mt5_files_dir() -> Path:
-    env = os.environ.get("MT5_FILES_DIR")
-    return Path(env) if env else _DEFAULT_MT5_FILES
 
 
 def _load_json(path: Path) -> Any:
@@ -112,16 +100,15 @@ Be specific, direct, and honest. No generic advice."""
 
 def check_and_journal_new_trades() -> list[dict]:
     """
-    Main entry point: detect new closed trades and journal them.
+    Main entry point: detect new closed trades via MetaApi history and journal them.
     Returns list of newly created lessons.
     """
-    # Read closed trades from MT5 bridge file
-    mt5_data = _load_json(_mt5_files_dir() / "closed_trades.json")
-    if not mt5_data or not mt5_data.get("trades"):
+    from skills.metaapi_client import get_closed_trades
+    closed_trades = get_closed_trades(days=30)
+    if not closed_trades:
         return []
 
-    closed_trades = mt5_data["trades"]
-    known_ids     = _get_known_ticket_ids()
+    known_ids = _get_known_ticket_ids()
 
     # Find trades not yet analyzed
     new_trades = [
