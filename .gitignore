@@ -16,6 +16,9 @@ data/monitor.log
 data/known_closed_trades.json
 data/trade_lessons.json
 
+# Historical OHLC cache — large binary-ish JSON, rebuilt via fetch_historical.py
+data/historical/
+
 # macOS
 .DS_Store
 
