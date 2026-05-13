@@ -8,7 +8,7 @@ Methodology (professional swing trading, FTMO-safe):
   3. Confirmation  (H4):  Engulfing or pin bar candle at the EMA zone
   4. Entry:               Close of confirmation candle (or next open)
   5. SL:                  Beyond the pullback extreme (candle low/high)
-  6. TP:                  Entry ± (SL distance × 2.0) minimum
+  6. TP:                  Entry ± (SL distance × 3.0) — raised from 2.0 per v3.0 backtest
 
 Data source: TwelveData API (https://twelvedata.com)
   Free plan: 800 req/day. Usage: ~108 req/day for 9 pairs x 6 H4 closes.
@@ -208,7 +208,7 @@ def _compute_signal(
     h4_candles: list[dict],
     sym: str,
     rrr_override: float | None = None,
-    sl_buffer_pips: int = 5,
+    sl_buffer_pips: int = 5,  # ablation showed SL +5p outperforms +3p on most pairs
 ) -> dict[str, Any]:
     """
     Pure function: derive a trading signal from already-loaded OHLC candles.
@@ -221,14 +221,15 @@ def _compute_signal(
     d1_candles      : D1 candles list [{t, o, h, l, c}], oldest first, min 55 needed
     h4_candles      : H4 candles list, oldest first, min 25 needed
     sym             : uppercase symbol e.g. "EURUSD"
-    rrr_override    : override the default 2.0 RRR (used by ablation variants)
+    rrr_override    : override the default 3.0 RRR (used by ablation variants)
     sl_buffer_pips  : pips added to H4 high/low for SL (default 5, ablation may use 3)
 
     Returns a dict with keys: symbol, signal, bias, analysis, trade (if actionable).
     Never makes network calls or reads files — all data is passed in.
     """
     pip_size = _PIP_SIZE.get(sym, 0.0001)
-    rrr      = rrr_override if rrr_override is not None else 2.0
+    # Default RRR raised to 3.0 based on v3.0 backtest (best variant: E=$+6.08/trade)
+    rrr      = rrr_override if rrr_override is not None else 3.0
 
     if len(d1_candles) < 55 or len(h4_candles) < 25:
         return {
