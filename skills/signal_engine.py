@@ -97,7 +97,17 @@ def _fetch_candles(symbol: str, interval: str, count: int = 100) -> list[dict] |
     """
     Fetch OHLC candles from TwelveData.
     Returns list of dicts {t, o, h, l, c} sorted oldest first.
+
+    IMPORTANT: TwelveData includes the current INCOMPLETE candle as the last
+    entry. We fetch count+1 and discard the last candle so the signal engine
+    only ever operates on fully CLOSED candles. This prevents phantom signals
+    that appear/disappear as the current candle is still forming.
+
+    Timestamps are parsed as UTC (using calendar.timegm) for consistency
+    across machines regardless of local timezone.
     """
+    import calendar
+
     td_sym = _SYMBOL_MAP.get(symbol)
     if not td_sym:
         return None
@@ -107,7 +117,7 @@ def _fetch_candles(symbol: str, interval: str, count: int = 100) -> list[dict] |
         {
             "symbol":     td_sym,
             "interval":   interval,
-            "outputsize": count,
+            "outputsize": count + 1,  # +1 because we'll drop the incomplete current candle
             "apikey":     _api_key(),
             "order":      "ASC",  # oldest first — required for EMA calculation
         },
@@ -119,8 +129,10 @@ def _fetch_candles(symbol: str, interval: str, count: int = 100) -> list[dict] |
     for v in data["values"]:
         try:
             fmt = "%Y-%m-%d %H:%M:%S" if " " in v["datetime"] else "%Y-%m-%d"
+            # Use calendar.timegm (UTC) instead of time.mktime (local TZ)
+            ts = int(calendar.timegm(time.strptime(v["datetime"], fmt)))
             candles.append({
-                "t": int(time.mktime(time.strptime(v["datetime"], fmt))),
+                "t": ts,
                 "o": float(v["open"]),
                 "h": float(v["high"]),
                 "l": float(v["low"]),
@@ -128,6 +140,13 @@ def _fetch_candles(symbol: str, interval: str, count: int = 100) -> list[dict] |
             })
         except (KeyError, ValueError):
             continue
+
+    if not candles:
+        return None
+
+    # Drop the last candle — it's the currently forming (incomplete) one
+    candles = candles[:-1]
+
     return candles if candles else None
 
 
